@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Anki Matematică · Clasele IX-XII · Bacalaureat 2027</title>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            options: {
+                enableMenu: false,
+                ignoreHtmlClass: 'no-mathjax',
+                processHtmlClass: 'math'
+            },
+            svg: {
+                fontCache: 'global',
+                mtextInheritFont: true,
+                scale: 1.0
+            },
+            menu: {
+                settings: {
+                    zoom: 'None',
+                    context: 'None'
+                }
+            }
+        };
+    </script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, system-ui, sans-serif;
+            background: #f0f4fa;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px;
+            padding-bottom: 20px;
+        }
+        .container {
+            max-width: 960px;
+            width: 100%;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -12px rgba(0, 20, 30, 0.25);
+            padding: 16px 18px 24px;
+            transition: all 0.2s;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0b2b4a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #eef2f9;
+            padding-bottom: 14px;
+            margin-bottom: 16px;
+        }
+        h1 small {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #4a6479;
+        }
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            background: #f0f4fe;
+            padding: 10px 14px;
+            border-radius: 40px;
+            margin-bottom: 16px;
+            font-weight: 500;
+            color: #1c3f5c;
+            gap: 6px;
+            font-size: 0.85rem;
+        }
+        .stats-bar span {
+            background: white;
+            padding: 3px 12px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            white-space: nowrap;
+        }
+        .card-wrapper {
+            perspective: 1200px;
+            margin: 12px 0 16px;
+        }
+        .flashcard {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px 20px;
+            min-height: 220px;
+            box-shadow: 0 8px 24px rgba(0, 20, 40, 0.08);
+            border: 1px solid #e9edf4;
+            display: flex;
+            flex-direction: column;
+            transition: 0.2s;
+            cursor: pointer;
+            position: relative;
+            touch-action: manipulation;
+        }
+        .flashcard:active {
+            transform: scale(0.99);
+        }
+        .card-tag {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            background: #dce5f2;
+            color: #1d3e5e;
+            padding: 3px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            align-self: flex-start;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .card-question {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0f2b41;
+            line-height: 1.7;
+            margin-bottom: 8px;
+            word-wrap: break-word;
+        }
+        .card-question .math {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .card-answer {
+            font-size: 1rem;
+            color: #1d3f5c;
+            background: #f7faff;
+            padding: 14px 16px;
+            border-radius: 16px;
+            border-left: 4px solid #3b7bb7;
+            margin-top: 6px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-x: auto;
+        }
+        .card-answer .math {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .card-answer.hidden {
+            display: none;
+        }
+        .card-meta {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            color: #5f7990;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .latex-badge {
+            background: #e8edf6;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #2a4b68;
+        }
+        .latex-badge.active {
+            background: #1d6b3e;
+            color: white;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px;
+            margin: 16px 0 12px;
+        }
+        .controls button {
+            background: white;
+            border: 1px solid #d0dcec;
+            padding: 8px 14px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #1d3f5c;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.01);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        .controls button:active {
+            transform: scale(0.95);
+        }
+        .controls button.primary {
+            background: #1d4a74;
+            border-color: #1d4a74;
+            color: white;
+        }
+        .controls button.primary:active {
+            background: #123a5c;
+        }
+        .controls button.learned {
+            background: #e2f0e6;
+            border-color: #5f9b7a;
+        }
+        .controls button.learned.active {
+            background: #5f9b7a;
+            border-color: #3d6b4e;
+            color: white;
+        }
+        .controls button .icon {
+            font-size: 1.1rem;
+        }
+        .controls button .label {
+            display: inline;
+        }
+        .progress {
+            height: 5px;
+            background: #e5ebf5;
+            border-radius: 12px;
+            margin: 16px 0 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #286b9e;
+            width: 0%;
+            border-radius: 12px;
+            transition: width 0.3s ease;
+        }
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin: 10px 0 8px;
+        }
+        .filter-section select, .filter-section input {
+            padding: 6px 12px;
+            border-radius: 40px;
+            border: 1px solid #cfddee;
+            background: white;
+            font-size: 0.8rem;
+            color: #1d3f5c;
+            outline: none;
+            flex: 1;
+            min-width: 80px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .filter-section select {
+            max-width: 140px;
+        }
+        .filter-section input {
+            min-width: 120px;
+        }
+        .filter-section select:focus, .filter-section input:focus {
+            border-color: #3b7bb7;
+            box-shadow: 0 0 0 3px rgba(59, 123, 183, 0.15);
+        }
+        .filter-section label {
+            font-weight: 500;
+            color: #2a4b68;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        .footer {
+            margin-top: 14px;
+            color: #59748d;
+            font-size: 0.7rem;
+            text-align: center;
+            border-top: 1px solid #e2eaf3;
+            padding-top: 14px;
+            line-height: 1.8;
+        }
+        .footer kbd {
+            background: #eef2f9;
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            border: 1px solid #d0dcec;
+            font-family: inherit;
+        }
+        .footer .desktop-only {
+            display: inline;
+        }
+        .swipe-indicator {
+            display: none;
+            text-align: center;
+            color: #8a9bb0;
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+
+         /* ===== ALINIEREA PERFECTĂ A FORMULELOR LATEX ===== */
+        /* Aliniere formule LaTeX în linie */
+mjx-container {
+    display: inline-block !important;
+    vertical-align: -0.01em !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+}
+
+mjx-container svg {
+    display: inline-block !important;
+}
+
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .container { padding: 12px 14px 18px; border-radius: 20px; }
+            h1 { font-size: 1.2rem; padding-bottom: 10px; margin-bottom: 12px; }
+            h1 small { font-size: 0.65rem; }
+            .stats-bar { padding: 8px 10px; font-size: 0.7rem; gap: 4px; }
+            .stats-bar span { padding: 2px 8px; font-size: 0.7rem; }
+            .flashcard { padding: 18px 14px; min-height: 180px; border-radius: 20px; }
+            .card-question { font-size: 1rem; }
+            .card-answer { font-size: 0.9rem; padding: 10px 12px; }
+            .controls button { padding: 6px 10px; font-size: 0.7rem; }
+            .controls button .label { display: none; }
+            .controls button .icon { font-size: 1.2rem; }
+            .footer .desktop-only { display: none; }
+            .swipe-indicator { display: block; }
+            .card-meta { font-size: 0.6rem; gap: 8px; }
+            .latex-badge { font-size: 0.55rem; padding: 1px 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 8px 10px 14px; border-radius: 16px; }
+            h1 { font-size: 1rem; }
+            .stats-bar { flex-wrap: wrap; justify-content: center; gap: 3px; }
+            .stats-bar span { font-size: 0.6rem; padding: 2px 6px; }
+            .flashcard { padding: 14px 10px; min-height: 150px; border-radius: 16px; }
+            .card-question { font-size: 0.9rem; }
+            .card-answer { font-size: 0.8rem; padding: 8px 10px; border-left-width: 3px; }
+            .controls { gap: 4px; }
+            .controls button { padding: 5px 8px; font-size: 0.65rem; border-radius: 30px; }
+            .controls button .icon { font-size: 1rem; }
+            .filter-section { gap: 4px; }
+            .filter-section select { max-width: 80px; font-size: 0.65rem; padding: 4px 8px; }
+            .filter-section input { min-width: 60px; font-size: 0.65rem; padding: 4px 8px; }
+            .footer { font-size: 0.6rem; padding-top: 10px; }
+            .footer kbd { font-size: 0.55rem; padding: 1px 5px; }
+        }
+
+        @media (min-width: 769px) {
+            .controls button { padding: 10px 22px; font-size: 0.9rem; }
+            .flashcard { padding: 32px 28px; min-height: 260px; }
+            .card-question { font-size: 1.4rem; }
+            .card-answer { font-size: 1.1rem; padding: 18px 20px; }
+        }
+
+        @media (hover: hover) {
+            .controls button:hover {
+                background: #e8effa;
+                border-color: #8eb0d1;
+                transform: scale(1.02);
+            }
+            .controls button.primary:hover {
+                background: #123a5c;
+            }
+            .flashcard:hover {
+                border-color: #b6cae0;
+                box-shadow: 0 12px 28px rgba(26, 67, 113, 0.08);
+            }
+        }
+
+        /* ===== MOD ÎNTUNECAT (DARK MODE) ===== */
+        body.dark { background: #0d1520; }
+        body.dark .container { background: #131d2b; box-shadow: 0 20px 40px -12px rgba(0,0,0,0.6); }
+        body.dark h1 { color: #eaf1fb; border-bottom-color: #223145; }
+        body.dark h1 small { color: #8fa6bf; }
+        body.dark .stats-bar { background: #182333; color: #cfe0f2; }
+        body.dark .stats-bar span { background: #0f1826; box-shadow: none; }
+        body.dark .flashcard { background: #17222f; border-color: #263449; box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+        body.dark .card-tag { background: #253549; color: #bcd2ea; }
+        body.dark .card-question { color: #eef3fa; }
+        body.dark .card-answer { background: #0f1926; color: #d7e4f2; border-left-color: #4a90c9; }
+        body.dark .card-meta { color: #7d93ab; }
+        body.dark .latex-badge { background: #253549; color: #bcd2ea; }
+        body.dark .latex-badge.active { background: #1d6b3e; color: white; }
+        body.dark .controls button { background: #17222f; border-color: #2c3d54; color: #dbe7f3; }
+        body.dark .controls button.primary { background: #2a5c8c; border-color: #2a5c8c; color: white; }
+        body.dark .controls button.learned { background: #1c3527; border-color: #3d6b4e; }
+        body.dark .controls button.learned.active { background: #3d8a5f; border-color: #3d8a5f; color: white; }
+        body.dark .progress { background: #1d2a3b; }
+        body.dark .filter-section select, body.dark .filter-section input { background: #17222f; border-color: #2c3d54; color: #dbe7f3; }
+        body.dark .filter-section label { color: #a9bdd3; }
+        body.dark .footer { color: #829ab3; border-top-color: #223145; }
+        body.dark .footer kbd { background: #1d2a3b; border-color: #2c3d54; color: #dbe7f3; }
+        body.dark #resetLearnedBtn { background: #17222f !important; border-color: #2c3d54 !important; color: #dbe7f3 !important; }
+        .theme-toggle {
+            margin-left: auto;
+            background: #eef2f9;
+            border: 1px solid #d0dcec;
+            border-radius: 40px;
+            padding: 3px 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: #1d3f5c;
+        }
+        body.dark .theme-toggle { background: #253549; border-color: #2c3d54; color: #dbe7f3; }
+
+        /* ===== AUTOEVALUARE (QUIZ) ===== */
+        .quiz-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 25, 38, 0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+        }
+        .quiz-box {
+            background: white;
+            border-radius: 18px;
+            padding: 24px 22px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 88vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+        body.dark .quiz-box { background: #131d2b; color: #dbe7f3; }
+        .quiz-btn {
+            border: none;
+            border-radius: 30px;
+            padding: 10px 18px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .quiz-btn-primary { background: #1a4371; color: white; }
+        .quiz-btn-secondary { background: #eef2f9; color: #1d3f5c; }
+        body.dark .quiz-btn-secondary { background: #253549; color: #dbe7f3; }
+        .quiz-btn-right { background: #1d6b3e; color: white; }
+        .quiz-btn-wrong { background: #a13a3a; color: white; }
+        .quiz-count-btn {
+            border: 1px solid #d0dcec;
+            background: #eef2f9;
+            border-radius: 30px;
+            padding: 7px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #1d3f5c;
+        }
+        .quiz-count-btn.active { background: #1a4371; color: white; border-color: #1a4371; }
+        body.dark .quiz-count-btn { background: #253549; border-color: #2c3d54; color: #dbe7f3; }
+        body.dark .quiz-count-btn.active { background: #2a5c8c; border-color: #2a5c8c; }
+        .quiz-progress-bar { height: 6px; background: #e2e9f2; border-radius: 6px; overflow: hidden; margin-bottom: 18px; }
+        body.dark .quiz-progress-bar { background: #1d2a3b; }
+        .quiz-progress-fill { height: 100%; background: #2a5c8c; width: 10%; transition: width 0.25s; }
+        .quiz-card {
+            background: #f7f9fc;
+            border: 1px solid #e2e9f2;
+            border-radius: 14px;
+            padding: 18px;
+            min-height: 140px;
+        }
+        body.dark .quiz-card { background: #17222f; border-color: #263449; }
+        .quiz-question { font-size: 1rem; font-weight: 600; margin-top: 10px; line-height: 1.5; }
+        .quiz-answer { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #cdd8e6; font-size: 0.92rem; line-height: 1.5; color: #2c4562; }
+        body.dark .quiz-answer { color: #c7d6e6; border-top-color: #2c3d54; }
+        .quiz-answer.hidden { display: none; }
+
+        .srs-rate-row { display: flex; gap: 8px; margin-top: 16px; }
+        .srs-rate-btn {
+            flex: 1;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            font-family: inherit;
+        }
+        .srs-rate-btn .interval-preview { font-size: 0.62rem; font-weight: 500; opacity: 0.9; }
+        @media (max-width: 480px) {
+            .srs-rate-row { flex-wrap: wrap; }
+            .srs-rate-btn { min-width: 44%; }
+        }
+        .quiz-missed-list { max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+        .quiz-missed-item { background: #fbeeee; border-radius: 10px; padding: 8px 12px; font-size: 0.75rem; color: #6b2a2a; }
+        body.dark .quiz-missed-item { background: #2a1a1a; color: #e8b8b8; }
+
+        /* ===== BUTOANE PILL (reutilizabile, înlocuiesc stilurile inline duplicate) ===== */
+        .pill-btn {
+            background: #ecf3fa;
+            border: 1px solid #d0dcec;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            cursor: pointer;
+            color: #1d3f5c;
+            font-family: inherit;
+        }
+        .pill-btn.primary {
+            background: #1d4a74;
+            color: white;
+            border-color: #1d4a74;
+            font-weight: 600;
+            padding: 4px 14px;
+        }
+        .pill-btn.active-filter { background: #1d4a74 !important; color: #fff !important; }
+        body.dark .pill-btn { background: #17222f; border-color: #2c3d54; color: #dbe7f3; }
+        body.dark .pill-btn.primary { background: #2a5c8c; border-color: #2a5c8c; color: #fff; }
+
+        /* ===== MOD FOCUS / FULLSCREEN (doar caseta cu întrebarea și răspunsul) ===== */
+        .focus-btn {
+            margin-left: 8px;
+        }
+        body.focus-mode-active {
+            background: #0d1520;
+        }
+        .container.focus-mode {
+            max-width: 640px;
+            width: 100%;
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        .container.focus-mode h1,
+        .container.focus-mode .stats-bar,
+        .container.focus-mode .filter-section,
+        .container.focus-mode .progress,
+        .container.focus-mode .footer,
+        .container.focus-mode .swipe-indicator {
+            display: none !important;
+        }
+        .container.focus-mode .card-wrapper {
+            width: 100%;
+            margin: 0 0 18px;
+        }
+        .container.focus-mode .flashcard {
+            min-height: min(64vh, 520px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+        .container.focus-mode .controls {
+            margin: 0;
+        }
+        .focus-exit-btn {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 2000;
+            background: rgba(20, 30, 45, 0.75);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: none;
+        }
+        .focus-exit-btn.visible {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        @media (max-width: 480px) {
+            .focus-exit-btn { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+<button class="focus-exit-btn" id="focusExitBtn" type="button">✖ Ieși din focus</button>
+<div class="container" id="app">
+    <h1>
+        <span>📚 Anki Matematică · Clasele IX-XII</span>
+        <small>Bacalaureat 2027</small>
+        <button class="theme-toggle" id="themeToggle" type="button">🌙 Mod întunecat</button>
+        <button class="theme-toggle focus-btn" id="fullscreenBtn" type="button">⛶ Mod focus</button>
+    </h1>
+
+    <div class="stats-bar">
+        <span>📖 <span id="cardCounter">0 / 0</span></span>
+        <span>✅ <span id="learnedCount">0</span></span>
+        <span>🏷️ <span id="tagDisplay">Toate</span></span>
+        <span>🧠 <span id="srsDueCount">0</span> de revizuit</span>
+    </div>
+
+    <div class="filter-section">
+        <label for="gradeFilter">Subiect:</label>
+        <select id="gradeFilter">
+            <option value="all">Toate</option>
+            <option value="I">Subiectul I</option>
+            <option value="II">Subiectul II</option>
+            <option value="III">Subiectul III</option>
+        </select>
+        <label for="tagFilter">Filtru:</label>
+        <select id="tagFilter">
+            <option value="all">Toate</option>
+            <option value="Algebră">Algebră</option>
+            <option value="Geometrie plană">Geometrie plană</option>
+            <option value="Geometrie spațiu">Geometrie spațiu</option>
+            <option value="Algebră superioară">Algebră superioară</option>
+            <option value="Analiză">Analiză</option>
+        </select>
+        <input type="text" id="searchInput" placeholder="🔍 Caută în întrebări și răspunsuri..." />
+        <button id="shuffleBtn" class="pill-btn">🔀 Amestecă</button>
+        <button id="unlearnedBtn" class="pill-btn">📌 Doar neînvățate</button>
+        <button id="quizStartBtn" class="pill-btn primary">📝 Autoevaluare</button>
+        <button id="srsStartBtn" class="pill-btn primary" style="background:#1d6b3e; border-color:#1d6b3e;">🧠 Repetiție</button>
+        <button id="resetLearnedBtn" class="pill-btn">Reset învățate</button>
+    </div>
+
+    <div class="card-wrapper">
+        <div class="flashcard" id="flashcard">
+            <div style="display:flex; gap:6px; align-self:flex-start; margin-bottom:12px;">
+                <div class="card-tag" id="cardTag" style="margin-bottom:0;">Algebră</div>
+                <div class="card-tag" id="cardGrade" style="margin-bottom:0;">Subiectul I</div>
+            </div>
+            <div class="card-question" id="cardQuestion">Întrebare</div>
+            <div class="card-answer hidden" id="cardAnswer">Răspuns</div>
+            <div class="card-meta">
+                <span id="cardId">#1</span>
+                <span id="cardSource">Sinteză Teorie Bac</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="swipe-indicator">👆 Trage stânga/dreapta sau folosește butoanele</div>
+
+    <div class="controls">
+        <button id="prevBtn"><span class="icon">◀</span><span class="label"> Înapoi</span></button>
+        <button id="showAnswerBtn" class="primary"><span class="icon">📖</span><span class="label"> Arată răspunsul</span></button>
+        <button id="nextBtn"><span class="icon">▶</span><span class="label"> Înainte</span></button>
+        <button id="learnedBtn" class="learned"><span class="icon">⭐</span><span class="label"> Învățat</span></button>
+    </div>
+
+    <div class="progress">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="footer">
+        <span>💡 Click pe card pentru răspuns</span>
+        <span class="desktop-only"> · ⌨️ <kbd>→</kbd><kbd>←</kbd> navigare · <kbd>Space</kbd> răspuns · <kbd>L</kbd> învățat · <kbd>F</kbd> mod focus</span>
+        <span> · 📋 <span id="totalCardsStat">0</span> carduri</span>
+        <br>
+        <span style="display:inline-block; background:#286b9e; color:white; padding:2px 10px; border-radius:30px; font-size:0.6rem; margin-top:6px; margin-left:4px;">💾 Progresul se salvează automat pe acest dispozitiv</span>
+    </div>
+</div>
+
+<!-- ============ AUTOEVALUARE (QUIZ) ============ -->
+<div class="quiz-overlay" id="quizOverlay" style="display:none;">
+    <div class="quiz-box" id="quizBox">
+
+        <!-- Ecran 1: Setare test -->
+        <div id="quizSetup">
+            <h2 style="margin:0 0 6px 0; font-size:1.15rem;">📝 Autoevaluare</h2>
+            <p id="quizSetupInfo" style="margin:0 0 16px 0; font-size:0.8rem; color:#5c7089;">Testul folosește filtrele active.</p>
+            <div id="quizBestScore" style="font-size:0.75rem; margin-bottom:14px; display:none;"></div>
+            <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:8px;">Câte întrebări?</label>
+            <div id="quizCountOptions" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"></div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="quizCancelBtn" class="quiz-btn quiz-btn-secondary">Anulează</button>
+                <button id="quizBeginBtn" class="quiz-btn quiz-btn-primary">Start test ▶</button>
+            </div>
+        </div>
+
+        <!-- Ecran 2: Test în desfășurare -->
+        <div id="quizPlay" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span id="quizProgressText" style="font-size:0.75rem; font-weight:600; color:#5c7089;">Întrebarea 1/10</span>
+                <span id="quizScoreText" style="font-size:0.75rem; font-weight:600; color:#1d6b3e;">✓ 0</span>
+            </div>
+            <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+            <div class="quiz-card">
+                <div style="display:flex; gap:6px;">
+                    <div class="card-tag" id="quizTag" style="margin-bottom:0;">Algebră</div>
+                    <div class="card-tag" id="quizGrade" style="margin-bottom:0;">Subiectul I</div>
+                </div>
+                <div class="quiz-question" id="quizQuestion">Întrebare</div>
+                <div class="quiz-answer hidden" id="quizAnswer">Răspuns</div>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:16px;" id="quizShowAnswerRow">
+                <button id="quizShowAnswerBtn" class="quiz-btn quiz-btn-primary" style="min-width:220px;">📖 Arată răspunsul</button>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:16px; display:none;" id="quizMarkRow">
+                <button id="quizWrongBtn" class="quiz-btn quiz-btn-wrong">✗ Nu am știut</button>
+                <button id="quizRightBtn" class="quiz-btn quiz-btn-right">✓ Am știut</button>
+            </div>
+            <button id="quizExitBtn" style="margin-top:18px; background:none; border:none; color:#8098b3; font-size:0.7rem; cursor:pointer; text-decoration:underline;">Ieși din test</button>
+        </div>
+
+        <!-- Ecran 3: Rezultate -->
+        <div id="quizResults" style="display:none;">
+            <h2 style="margin:0 0 4px 0; font-size:1.15rem;">🏁 Rezultat</h2>
+            <div id="quizResultScore" style="font-size:2.2rem; font-weight:800; margin:10px 0 4px 0; text-align:center;">8/10</div>
+            <div id="quizResultPercent" style="text-align:center; font-size:0.85rem; color:#5c7089; margin-bottom:6px;">80%</div>
+            <div id="quizResultBest" style="text-align:center; font-size:0.72rem; color:#1d6b3e; margin-bottom:16px; display:none;"></div>
+            <div id="quizMissedWrap" style="display:none; margin-bottom:16px;">
+                <div style="font-size:0.75rem; font-weight:700; margin-bottom:8px; color:#a13a3a;">De revizuit:</div>
+                <div id="quizMissedList" class="quiz-missed-list"></div>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button id="quizRetryMissedBtn" class="quiz-btn quiz-btn-secondary" style="display:none;">🔁 Reia greșelile</button>
+                <button id="quizRestartBtn" class="quiz-btn quiz-btn-secondary">↺ Test nou</button>
+                <button id="quizCloseBtn" class="quiz-btn quiz-btn-primary">Închide</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============ MODUL DE REPETIȚIE ============ -->
+<div class="quiz-overlay" id="srsOverlay" style="display:none;">
+    <div class="quiz-box" id="srsBox">
+
+        <!-- Ecran 1: setare sesiune -->
+        <div id="srsSetup">
+            <h2 style="margin:0 0 6px 0; font-size:1.15rem;">🧠 Repetiție</h2>
+            <p id="srsSetupInfo" style="margin:0 0 10px 0; font-size:0.8rem; color:#5c7089;"></p>
+            <p style="margin:0 0 18px 0; font-size:0.72rem; color:#8098b3;">Cardurile greșite revin mai des, cele știute bine revin după intervale tot mai mari — la fel ca într-un Anki clasic. Sesiunea folosește filtrele active.</p>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="srsCancelBtn" class="quiz-btn quiz-btn-secondary">Închide</button>
+                <button id="srsBeginBtn" class="quiz-btn quiz-btn-primary">Începe ▶</button>
+            </div>
+        </div>
+
+        <!-- Ecran 2: sesiune în desfășurare -->
+        <div id="srsPlay" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span id="srsProgressText" style="font-size:0.75rem; font-weight:600; color:#5c7089;"></span>
+                <span style="font-size:0.75rem; font-weight:600; color:#1d6b3e;">🧠 Repetiție</span>
+            </div>
+            <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="srsProgressFill"></div></div>
+            <div class="quiz-card">
+                <div style="display:flex; gap:6px;">
+                    <div class="card-tag" id="srsTag" style="margin-bottom:0;"></div>
+                    <div class="card-tag" id="srsGrade" style="margin-bottom:0;"></div>
+                </div>
+                <div class="quiz-question" id="srsQuestion"></div>
+                <div class="quiz-answer hidden" id="srsAnswer"></div>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:16px;" id="srsShowAnswerRow">
+                <button id="srsShowAnswerBtn" class="quiz-btn quiz-btn-primary" style="min-width:220px;">📖 Arată răspunsul</button>
+            </div>
+            <div class="srs-rate-row" id="srsRateRow" style="display:none;">
+                <button class="srs-rate-btn" id="srsAgainBtn" style="background:#a13a3a;">😵 Din nou<span class="interval-preview" id="srsAgainPrev"></span></button>
+                <button class="srs-rate-btn" id="srsHardBtn" style="background:#c07a2e;">😐 Greu<span class="interval-preview" id="srsHardPrev"></span></button>
+                <button class="srs-rate-btn" id="srsGoodBtn" style="background:#2a6e8f;">🙂 Bine<span class="interval-preview" id="srsGoodPrev"></span></button>
+                <button class="srs-rate-btn" id="srsEasyBtn" style="background:#1d6b3e;">😄 Ușor<span class="interval-preview" id="srsEasyPrev"></span></button>
+            </div>
+            <button id="srsExitBtn" style="margin-top:18px; background:none; border:none; color:#8098b3; font-size:0.7rem; cursor:pointer; text-decoration:underline;">Ieși din repetiție</button>
+        </div>
+
+        <!-- Ecran 3: sesiune încheiată -->
+        <div id="srsDone" style="display:none;">
+            <h2 style="margin:0 0 4px 0; font-size:1.15rem;">🎉 Gata pentru azi!</h2>
+            <p id="srsDoneText" style="font-size:0.85rem; color:#5c7089; text-align:center; margin:14px 0 20px;"></p>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button id="srsStudyExtraBtn" class="quiz-btn quiz-btn-secondary" style="display:none;">📚 Studiază și restul, oricum</button>
+                <button id="srsCloseBtn" class="quiz-btn quiz-btn-primary">Închide</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    // DATELE CARDURILOR - EXTRASE DIN SINTEZA BAC 2027 (CLASELE IX-XII)
+    // Toate întrebările și răspunsurile sunt preluate din PDF-ul atașat.
+    // ============================================================
+    const baseCardsData = [
+        // --- SUBIECTUL I: Algebră și Geometrie (Clasele IX-X) ---
+        { id: 'b1', grade: 'I', tag: 'Algebră',
+          question: 'Formula termenului general pentru progresia aritmetică $(a_n)_{n\\ge1}$.',
+          answer: '$a_n = a_1 + (n-1) \\cdot r$, unde $r$ este rația.' },
+        { id: 'b2', grade: 'I', tag: 'Algebră',
+          question: 'Condiția ca trei numere $a, b, c$ să fie în progresie aritmetică.',
+          answer: '$b = \\dfrac{a+c}{2} \\iff 2b = a + c$.' },
+        { id: 'b3', grade: 'I', tag: 'Algebră',
+          question: 'Formula sumei primilor $n$ termeni ai unei progresii aritmetice.',
+          answer: '$S_n = \\dfrac{(a_1 + a_n)\\cdot n}{2} = \\dfrac{[2a_1 + (n-1)r]\\cdot n}{2}$.' },
+        { id: 'b4', grade: 'I', tag: 'Algebră',
+          question: 'Formula termenului general pentru progresia geometrică $(b_n)_{n\\ge1}$.',
+          answer: '$b_n = b_1 \\cdot q^{n-1}$, cu $q \\neq 0$.' },
+        { id: 'b5', grade: 'I', tag: 'Algebră',
+          question: 'Condiția ca trei numere pozitive $a, b, c$ să fie în progresie geometrică.',
+          answer: '$b^2 = a \\cdot c \\iff b = \\sqrt{a \\cdot c}$.' },
+        { id: 'b6', grade: 'I', tag: 'Algebră',
+          question: 'Suma primilor $n$ termeni ai unei progresii geometrice ($q \\neq 1$).',
+          answer: '$S_n = b_1 \\cdot \\dfrac{q^n - 1}{q - 1}$.' },
+        { id: 'b7', grade: 'I', tag: 'Algebră',
+          question: 'Sume remarcabile: $\\sum_{k=1}^{n} k$; $\\sum_{k=1}^{n} k^2$; $\\sum_{k=1}^{n} k^3$.',
+          answer: '$\\sum k = \\frac{n(n+1)}{2}$; $\\sum k^2 = \\frac{n(n+1)(2n+1)}{6}$; $\\sum k^3 = \\left[\\frac{n(n+1)}{2}\\right]^2$.' },
+        { id: 'b8', grade: 'I', tag: 'Algebră',
+          question: 'Principiul inducției matematice: enunț.',
+          answer: '1) $P(n_0)$ adevărată. 2) Dacă $P(k)$ adevărată $\\Rightarrow P(k+1)$ adevărată. Atunci $P(n)$ adevărată $\\forall n \\ge n_0$.' },
+        { id: 'b9', grade: 'I', tag: 'Algebră',
+          question: 'Definiția modulului: $|t|$.',
+          answer: '$|t| = \\begin{cases} t, & t\\ge 0 \\\\ -t, & t<0 \\end{cases}$.' },
+        { id: 'b10', grade: 'I', tag: 'Algebră',
+          question: 'Puteri: $a^{-n}$; $\\left(\\frac{a}{b}\\right)^{-n}$.',
+          answer: '$a^{-n} = \\frac{1}{a^n}$; $\\left(\\frac{a}{b}\\right)^{-n} = \\left(\\frac{b}{a}\\right)^n$.' },
+        { id: 'b11', grade: 'I', tag: 'Algebră',
+          question: 'Condiții de existență pentru radicali: $\\sqrt{f(x)}$ (ordin par) și $\\sqrt[3]{f(x)}$ (ordin impar).',
+          answer: 'Ordin par: $f(x) \\ge 0$. Ordin impar: nu există restricții ($f(x) \\in \\mathbb{R}$).' },
+        { id: 'b12', grade: 'I', tag: 'Algebră',
+          question: 'Semnul funcției de gradul I: $f(x)=ax+b$, $a>0$.',
+          answer: '$f(x)<0$ pentru $x<-\\frac{b}{a}$; $f(x)=0$ pentru $x=-\\frac{b}{a}$; $f(x)>0$ pentru $x>-\\frac{b}{a}$.' },
+        { id: 'b13', grade: 'I', tag: 'Algebră',
+          question: 'Definiții: funcție pară, impară, periodică.',
+          answer: 'Pară: $f(-x)=f(x)$. Impară: $f(-x)=-f(x)$. Periodică de perioadă $K$: $f(x+K)=f(x)$.' },
+        { id: 'b14', grade: 'I', tag: 'Algebră',
+          question: 'Când o funcție este inversabilă?',
+          answer: '$f$ este inversabilă $\\iff$ este bijectivă (injectivă și surjectivă).' },
+        { id: 'b15', grade: 'I', tag: 'Algebră',
+          question: 'Condiția ca un punct $M(x_0,y_0)$ să aparțină graficului lui $f$.',
+          answer: '$M \\in G_f \\iff f(x_0) = y_0$.' },
+        { id: 'b16', grade: 'I', tag: 'Algebră',
+          question: 'Vârful parabolei pentru $f(x)=ax^2+bx+c$ ($a\\neq0$).',
+          answer: '$V\\left(-\\frac{b}{2a},\\, -\\frac{\\Delta}{4a}\\right)$.' },
+        { id: 'b17', grade: 'I', tag: 'Algebră',
+          question: 'Relațiile lui Viète pentru $ax^2+bx+c=0$: $S$, $P$.',
+          answer: '$S = x_1+x_2 = -\\frac{b}{a}$; $P = x_1\\cdot x_2 = \\frac{c}{a}$.' },
+        { id: 'b18', grade: 'I', tag: 'Algebră',
+          question: 'Compunerea funcțiilor: $(g\\circ f)(x)$ și inversa compunerii.',
+          answer: '$(g\\circ f)(x)=g(f(x))$. Dacă $f,g$ inversabile, atunci $(g\\circ f)^{-1} = f^{-1}\\circ g^{-1}$.' },
+        { id: 'b19', grade: 'I', tag: 'Algebră',
+          question: 'Ecuații iraționale: $\\sqrt{f(x)} = g(x)$ – condiții și rezolvare.',
+          answer: 'C.E.: $f(x)\\ge0$, $g(x)\\ge0$. Se ridică la pătrat: $f(x)=[g(x)]^2$. Soluțiile se verifică.' },
+        { id: 'b20', grade: 'I', tag: 'Algebră',
+          question: 'Ecuații exponențiale: $a^{f(x)} = a^{g(x)}$.',
+          answer: '$a^{f(x)} = a^{g(x)} \\iff f(x)=g(x)$ (deoarece funcția exponențială este injectivă).' },
+        { id: 'b21', grade: 'I', tag: 'Algebră',
+          question: 'Monotonia funcției exponențiale $f(x)=a^x$ ($a>0, a\\neq1$).',
+          answer: 'Dacă $a\\in(0,1)$: strict descrescătoare. Dacă $a\\in(1,\\infty)$: strict crescătoare.' },
+        { id: 'b22', grade: 'I', tag: 'Algebră',
+          question: 'Proprietăți fundamentale ale logaritmilor: $\\log_a x + \\log_a y$; $\\log_a x - \\log_a y$; $\\log_a x^k$.',
+          answer: '$\\log_a x + \\log_a y = \\log_a(xy)$; $\\log_a x - \\log_a y = \\log_a\\frac{x}{y}$; $\\log_a x^k = k\\log_a x$.' },
+        { id: 'b23', grade: 'I', tag: 'Algebră',
+          question: 'Formula de schimbare a bazei pentru logaritmi.',
+          answer: '$\\log_a b = \\frac{\\log_c b}{\\log_c a} = \\frac{1}{\\log_b a}$.' },
+        { id: 'b24', grade: 'I', tag: 'Algebră',
+          question: 'Monotonia funcției logaritmice $f(x)=\\log_a x$ ($a>0, a\\neq1$).',
+          answer: 'Dacă $a\\in(0,1)$: strict descrescătoare. Dacă $a\\in(1,\\infty)$: strict crescătoare.' },
+        { id: 'b25', grade: 'I', tag: 'Algebră',
+          question: 'Permutări: $P_n$.',
+          answer: '$P_n = n! = 1\\cdot2\\cdot\\ldots\\cdot n$, cu $0!=1$.' },
+        { id: 'b26', grade: 'I', tag: 'Algebră',
+          question: 'Aranjamente: $A_n^k$.',
+          answer: '$A_n^k = \\frac{n!}{(n-k)!}$ (contează ordinea elementelor alese).' },
+        { id: 'b27', grade: 'I', tag: 'Algebră',
+          question: 'Combinări: $C_n^k$.',
+          answer: '$C_n^k = \\frac{n!}{k!(n-k)!}$ (nu contează ordinea elementelor).' },
+        { id: 'b28', grade: 'I', tag: 'Algebră',
+          question: 'Formula probabilității: $P(A)$.',
+          answer: '$P(A) = \\dfrac{\\text{număr cazuri favorabile}}{\\text{număr cazuri posibile}}$.' },
+        { id: 'b29', grade: 'I', tag: 'Algebră',
+          question: 'Numărul de funcții $f:M\\to N$ cu $|M|=m, |N|=n$.',
+          answer: '$n^m$.' },
+        { id: 'b30', grade: 'I', tag: 'Algebră',
+          question: 'Numărul de funcții injective $f:M\\to N$ ($m\\le n$).',
+          answer: '$A_n^m = \\frac{n!}{(n-m)!}$.' },
+        { id: 'b31', grade: 'I', tag: 'Algebră',
+          question: 'Numărul de funcții bijective $f:M\\to N$ ($m=n$).',
+          answer: '$P_n = n!$.' },
+        { id: 'b32', grade: 'I', tag: 'Algebră',
+          question: 'Numărul de funcții strict crescătoare $f:M\\to N$ ($m\\le n$).',
+          answer: '$C_n^m = \\frac{n!}{m!(n-m)!}$.' },
+        { id: 'b33', grade: 'I', tag: 'Algebră',
+          question: 'Numărul de funcții strict monotone $f:M\\to N$ ($m\\le n$).',
+          answer: '$2\\cdot C_n^m$.' },
+        { id: 'b34', grade: 'I', tag: 'Algebră',
+          question: 'Numărul de submulțimi ale unei mulțimi cu $n$ elemente.',
+          answer: '$2^n$ (inclusiv mulțimea vidă și ea însăși).' },
+        { id: 'b35', grade: 'I', tag: 'Algebră',
+          question: 'Regula produsului și numărul de numere de 2 cifre, 3 cifre, 2 cifre distincte.',
+          answer: '2 cifre: $9\\cdot10=90$; 3 cifre: $9\\cdot10\\cdot10=900$; 2 cifre distincte: $9\\cdot9=81$.' },
+        { id: 'b36', grade: 'I', tag: 'Algebră',
+          question: 'Binomul lui Newton: formula generală.',
+          answer: '$(a+b)^n = \\sum_{k=0}^{n} C_n^k a^{n-k} b^k$.' },
+        { id: 'b37', grade: 'I', tag: 'Algebră',
+          question: 'Termenul general $T_{k+1}$ al dezvoltării binomului.',
+          answer: '$T_{k+1} = C_n^k a^{n-k} b^k$, $k=0,1,\\dots,n$.' },
+        { id: 'b38', grade: 'I', tag: 'Geometrie plană',
+          question: 'Lungimea segmentului $AB$: $A(x_A,y_A), B(x_B,y_B)$.',
+          answer: '$AB = \\sqrt{(x_B-x_A)^2 + (y_B-y_A)^2}$.' },
+        { id: 'b39', grade: 'I', tag: 'Geometrie plană',
+          question: 'Mijlocul segmentului $AB$: coordonate.',
+          answer: '$M\\left(\\frac{x_A+x_B}{2}, \\frac{y_A+y_B}{2}\\right)$.' },
+        { id: 'b40', grade: 'I', tag: 'Geometrie plană',
+          question: 'Panta dreptei $AB$: formula.',
+          answer: '$m = \\frac{y_B-y_A}{x_B-x_A}$.' },
+        { id: 'b41', grade: 'I', tag: 'Geometrie plană',
+          question: 'Ecuația dreptei printr-un punct și pantă: $M(x_0,y_0)$, panta $m$.',
+          answer: '$y - y_0 = m(x - x_0)$.' },
+        { id: 'b42', grade: 'I', tag: 'Geometrie plană',
+          question: 'Distanța de la punctul $A(x_0,y_0)$ la dreapta $d: ax+by+c=0$.',
+          answer: '$d(A,d) = \\dfrac{|ax_0+by_0+c|}{\\sqrt{a^2+b^2}}$.' },
+        { id: 'b43', grade: 'I', tag: 'Geometrie plană',
+          question: 'Condiția de paralelism pentru două drepte $d_1, d_2$.',
+          answer: '$d_1 \\parallel d_2 \\iff m_1 = m_2$.' },
+        { id: 'b44', grade: 'I', tag: 'Geometrie plană',
+          question: 'Condiția de perpendicularitate pentru două drepte $d_1, d_2$.',
+          answer: '$d_1 \\perp d_2 \\iff m_1 \\cdot m_2 = -1$.' },
+        { id: 'b45', grade: 'I', tag: 'Geometrie plană',
+          question: 'Aria triunghiului cu determinant (coordonate).',
+          answer: '$\\mathcal{A} = \\frac{1}{2}|\\Delta|$, unde $\\Delta = \\begin{vmatrix} x_A & y_A & 1 \\\\ x_B & y_B & 1 \\\\ x_C & y_C & 1 \\end{vmatrix}$. Dacă $\\Delta=0$, punctele sunt coliniare.' },
+        { id: 'b46', grade: 'I', tag: 'Trigonometrie',
+          question: 'Formule fundamentale: $\\sin^2 x + \\cos^2 x$; $\\tan x$; $\\cot x$; $\\tan x\\cdot\\cot x$.',
+          answer: '$\\sin^2 x + \\cos^2 x = 1$; $\\tan x = \\frac{\\sin x}{\\cos x}$; $\\cot x = \\frac{\\cos x}{\\sin x}$; $\\tan x\\cdot\\cot x = 1$.' },
+        { id: 'b47', grade: 'I', tag: 'Trigonometrie',
+          question: 'Valori remarcabile: $\\sin 30^\\circ, \\sin 45^\\circ, \\sin 60^\\circ$; $\\cos 30^\\circ, \\cos 45^\\circ, \\cos 60^\\circ$.',
+          answer: '$\\sin 30=\\frac12,\\ \\sin 45=\\frac{\\sqrt2}{2},\\ \\sin 60=\\frac{\\sqrt3}{2}$; $\\cos 30=\\frac{\\sqrt3}{2},\\ \\cos 45=\\frac{\\sqrt2}{2},\\ \\cos 60=\\frac12$.' },
+        { id: 'b48', grade: 'I', tag: 'Trigonometrie',
+          question: 'Formule: $\\sin(a+b)$, $\\sin(a-b)$, $\\cos(a+b)$, $\\cos(a-b)$.',
+          answer: '$\\sin(a\\pm b)=\\sin a\\cos b \\pm \\cos a\\sin b$; $\\cos(a\\pm b)=\\cos a\\cos b \\mp \\sin a\\sin b$.' },
+        { id: 'b49', grade: 'I', tag: 'Trigonometrie',
+          question: 'Formule: $\\sin 2a$, $\\cos 2a$.',
+          answer: '$\\sin 2a = 2\\sin a\\cos a$; $\\cos 2a = \\cos^2 a - \\sin^2 a = 2\\cos^2 a -1 = 1-2\\sin^2 a$.' },
+        { id: 'b50', grade: 'I', tag: 'Trigonometrie',
+          question: 'Ecuații trigonometrice fundamentale: $\\sin x = a$, $\\cos x = a$ ($|a|\\le1$).',
+          answer: '$\\sin x = a \\Rightarrow x = (-1)^k\\arcsin a + k\\pi$; $\\cos x = a \\Rightarrow x = \\pm\\arccos a + 2k\\pi$.' },
+        { id: 'b51', grade: 'I', tag: 'Trigonometrie',
+          question: 'Teorema cosinusului într-un triunghi.',
+          answer: '$a^2 = b^2 + c^2 - 2bc\\cos A$.' },
+        { id: 'b52', grade: 'I', tag: 'Trigonometrie',
+          question: 'Teorema sinusurilor.',
+          answer: '$\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R$ ($R$ raza cercului circumscris).' },
+        { id: 'b53', grade: 'I', tag: 'Geometrie plană',
+          question: 'Aria triunghiului: formula generală, cu sinus, Heron.',
+          answer: '$\\mathcal{A} = \\frac{b\\cdot h}{2} = \\frac{ab\\sin C}{2} = \\frac{abc}{4R} = \\sqrt{p(p-a)(p-b)(p-c)}$.' },
+        { id: 'b54', grade: 'I', tag: 'Geometrie plană',
+          question: 'Raza cercului circumscris $R$ și înscris $r$ în triunghi.',
+          answer: '$R = \\frac{abc}{4A}$; $r = \\frac{A}{p}$ ($p$ semiperimetru).' },
+        { id: 'b55', grade: 'I', tag: 'Numere complexe',
+          question: 'Forma unui număr complex: $z=a+bi$, $i^2=-1$. Partea reală și imaginară.',
+          answer: '$\\operatorname{Re}(z)=a$, $\\operatorname{Im}(z)=b$.' },
+        { id: 'b56', grade: 'I', tag: 'Numere complexe',
+          question: 'Conjugatul și modulul unui număr complex $z=a+bi$.',
+          answer: '$\\bar{z}=a-bi$; $|z|=\\sqrt{a^2+b^2}$.' },
+        { id: 'b57', grade: 'I', tag: 'Numere complexe',
+          question: 'Proprietăți ale modulului: $|z|$, $|\\bar{z}|$, $|z_1\\cdot z_2|$, $|z_1+z_2|$.',
+          answer: '$|z|\\ge0$, $|z|=|\\bar{z}|$, $|z_1\\cdot z_2|=|z_1|\\cdot|z_2|$, $|z_1+z_2|\\le |z_1|+|z_2|$.' },
+        { id: 'b58', grade: 'I', tag: 'Numere complexe',
+          question: 'Forma trigonometrică a unui număr complex și formula lui Moivre.',
+          answer: '$z = r(\\cos\\theta + i\\sin\\theta)$; $z^n = r^n(\\cos n\\theta + i\\sin n\\theta)$.' },
+        { id: 'b59', grade: 'I', tag: 'Vectori',
+          question: 'Vectorul $\\overrightarrow{AB}$ pentru $A(x_A,y_A), B(x_B,y_B)$.',
+          answer: '$\\overrightarrow{AB} = (x_B-x_A)\\vec{i} + (y_B-y_A)\\vec{j}$.' },
+        { id: 'b60', grade: 'I', tag: 'Vectori',
+          question: 'Modulul vectorului $\\overrightarrow{AB}$.',
+          answer: '$\\|\\overrightarrow{AB}\\| = \\sqrt{(x_B-x_A)^2+(y_B-y_A)^2}$.' },
+        { id: 'b61', grade: 'I', tag: 'Vectori',
+          question: 'Produsul scalar: $\\vec{a}\\cdot\\vec{b}$ și formula cu coordonate.',
+          answer: '$\\vec{a}\\cdot\\vec{b} = |\\vec{a}|\\cdot|\\vec{b}|\\cdot\\cos\\angle(\\vec{a},\\vec{b}) = x_1x_2+y_1y_2$.' },
+        { id: 'b62', grade: 'I', tag: 'Vectori',
+          question: 'Condiția de coliniaritate pentru doi vectori.',
+          answer: '$\\vec{a} \\parallel \\vec{b} \\iff \\vec{a} = \\lambda\\vec{b} \\iff x_1y_2 - x_2y_1 = 0$.' },
+
+        // --- SUBIECTUL al II-lea: Algebră Superioară (Clasele XI-XII) ---
+        { id: 'b63', grade: 'II', tag: 'Algebră superioară',
+          question: 'Determinant de ordinul 2: formula.',
+          answer: '$\\begin{vmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{vmatrix} = a_{11}a_{22} - a_{12}a_{21}$.' },
+        { id: 'b64', grade: 'II', tag: 'Algebră superioară',
+          question: 'Determinant de ordinul 3: regula lui Sarrus.',
+          answer: '$\\begin{vmatrix} a_{11} & a_{12} & a_{13} \\\\ a_{21} & a_{22} & a_{23} \\\\ a_{31} & a_{32} & a_{33} \\end{vmatrix} = a_{11}a_{22}a_{33} + a_{21}a_{32}a_{13} + a_{12}a_{23}a_{31} - a_{13}a_{22}a_{31} - a_{12}a_{21}a_{33} - a_{11}a_{23}a_{32}$.' },
+        { id: 'b65', grade: 'II', tag: 'Algebră superioară',
+          question: 'Proprietăți ale determinanților: det$(A^t)$, det$(A\\cdot B)$, det$(A^n)$.',
+          answer: 'det$(A^t)=$det$(A)$; det$(A\\cdot B)=$det$(A)\\cdot$det$(B)$; det$(A^n)=($det$A)^n$.' },
+        { id: 'b66', grade: 'II', tag: 'Algebră superioară',
+          question: 'Formula inversei unei matrice $A$: $A^{-1}$.',
+          answer: '$A^{-1} = \\frac{1}{\\det(A)} \\cdot A^*$, unde $A^*$ este adjuncta (transpusa complementelor algebrice).' },
+        { id: 'b67', grade: 'II', tag: 'Algebră superioară',
+          question: 'Teorema lui Kronecker-Capelli: compatibilitatea sistemelor.',
+          answer: 'Sistemul este compatibil $\\iff$ rang$(A)$ = rang$\\overline{A}$.' },
+        { id: 'b68', grade: 'II', tag: 'Algebră superioară',
+          question: 'Regula lui Cramer pentru sisteme cu det$(A)\\neq0$: $x$, $y$, $z$.',
+          answer: '$x = \\frac{\\Delta_x}{\\Delta}$, $y = \\frac{\\Delta_y}{\\Delta}$, $z = \\frac{\\Delta_z}{\\Delta}$.' },
+        { id: 'b69', grade: 'II', tag: 'Algebră superioară',
+          question: 'Ecuații matriceale: $A\\cdot X = B$, $X\\cdot A = B$, $A\\cdot X\\cdot B = C$.',
+          answer: '$X = A^{-1}B$; $X = BA^{-1}$; $X = A^{-1}CB^{-1}$ (dacă $A,B$ inversabile).' },
+        { id: 'b70', grade: 'II', tag: 'Algebră superioară',
+          question: 'Definiția legii de compoziție; parte stabilă.',
+          answer: 'Lege de compoziție: $*:M\\times M\\to M$. $H\\subseteq M$ este parte stabilă dacă $\\forall x,y\\in H \\Rightarrow x*y\\in H$.' },
+        { id: 'b71', grade: 'II', tag: 'Algebră superioară',
+          question: 'Proprietăți ale operațiilor: asociativitate, comutativitate, element neutru, elemente simetrizabile.',
+          answer: 'Asociativitate: $(x*y)*z=x*(y*z)$; comutativitate: $x*y=y*x$; element neutru $e$: $e*x=x*e=x$; element simetric $x\'$: $x*x\'=x\'*x=e$.' },
+        { id: 'b72', grade: 'II', tag: 'Algebră superioară',
+          question: 'Definiția grupului: $(G,*)$.',
+          answer: '1) $*$ lege de compoziție; 2) asociativă; 3) element neutru; 4) orice element simetrizabil. Dacă și comutativă $\\Rightarrow$ grup abelian.' },
+        { id: 'b73', grade: 'II', tag: 'Algebră superioară',
+          question: 'Definiția monoidului.',
+          answer: '$(M,*)$ este monoid dacă $*$ este asociativă și are element neutru (nu neapărat elemente simetrizabile).' },
+        { id: 'b74', grade: 'II', tag: 'Algebră superioară',
+          question: 'Definiția inelului: $(A,+,\\cdot)$.',
+          answer: '1) $(A,+)$ grup abelian; 2) $(A,\\cdot)$ monoid; 3) înmulțirea distributivă față de adunare.' },
+        { id: 'b75', grade: 'II', tag: 'Algebră superioară',
+          question: 'Morfism de grupuri: $f:G_1\\to G_2$; proprietăți.',
+          answer: '$f(x*y)=f(x)\\circ f(y)$; $f(e_1)=e_2$; $f(x\')=(f(x))\'$. Dacă $f$ bijectivă $\\Rightarrow$ izomorfism.' },
+        { id: 'b76', grade: 'II', tag: 'Algebră superioară',
+          question: 'Teorema restului (Bézout): restul împărțirii lui $P(X)$ la $(X-a)$.',
+          answer: '$R = P(a)$.' },
+        { id: 'b77', grade: 'II', tag: 'Algebră superioară',
+          question: 'Rădăcinile întregi ale unei ecuații algebrice cu coeficienți în $\\mathbb{Z}$.',
+          answer: 'Sunt divizorii termenului liber.' },
+        { id: 'b78', grade: 'II', tag: 'Algebră superioară',
+          question: 'Rădăcinile raționale ale unei ecuații algebrice cu coeficienți în $\\mathbb{Z}$: forma $\\frac{p}{q}$.',
+          answer: '$p$ divide termenul liber, $q$ divide coeficientul dominant.' },
+        { id: 'b79', grade: 'II', tag: 'Algebră superioară',
+          question: 'Relațiile lui Viète pentru $ax^3+bx^2+cx+d=0$: sumă, sumă produse 2 câte 2, produs.',
+          answer: '$x_1+x_2+x_3 = -\\frac{b}{a}$; $x_1x_2+x_1x_3+x_2x_3 = \\frac{c}{a}$; $x_1x_2x_3 = -\\frac{d}{a}$.' },
+        { id: 'b80', grade: 'II', tag: 'Algebră superioară',
+          question: 'Relațiile lui Viète pentru $ax^4+bx^3+cx^2+dx+e=0$: formulele.',
+          answer: '$ \\sum x_i = -\\frac{b}{a} $; $ \\sum x_i x_j = \\frac{c}{a} $; $ \\sum x_i x_j x_k = -\\frac{d}{a} $; $ x_1x_2x_3x_4 = \\frac{e}{a} $.' },
+        // --- SUBIECTUL al III-lea: Analiză Matematică (Clasele XI-XII) ---
+        { id: 'b81', grade: 'III', tag: 'Analiză',
+          question: 'Formula derivatei într-un punct $x_0$: $f\'(x_0)$.',
+          answer: '$f\'(x_0) = \\lim_{x\\to x_0} \\frac{f(x)-f(x_0)}{x-x_0}$.' },
+        { id: 'b82', grade: 'III', tag: 'Analiză',
+          question: 'Teorema lui Fermat: condiția pentru punct de extrem local.',
+          answer: 'Dacă $f$ este derivabilă în $x_0$ și $x_0$ este punct de extrem local, atunci $f\'(x_0)=0$.' },
+        { id: 'b83', grade: 'III', tag: 'Analiză',
+          question: 'Teorema lui Lagrange (a creșterilor finite).',
+          answer: 'Fie $f:[a,b]\\to\\mathbb{R}$ continuă, derivabilă pe $(a,b)$. Atunci $\\exists c\\in(a,b)$ a.î. $f\'(c)=\\frac{f(b)-f(a)}{b-a}$.' },
+        { id: 'b84', grade: 'III', tag: 'Analiză',
+          question: 'Teorema lui Rolle.',
+          answer: 'Fie $f:[a,b]\\to\\mathbb{R}$ continuă, derivabilă pe $(a,b)$ și $f(a)=f(b)$. Atunci $\\exists c\\in(a,b)$ a.î. $f\'(c)=0$.' },
+        { id: 'b85', grade: 'III', tag: 'Analiză',
+          question: 'Reguli de derivare: $(f+g)\'$, $(c\\cdot f)\'$, $(f\\cdot g)\'$, $(f/g)\'$, $[f(g(x))]\'$.',
+          answer: '$(f+g)\'=f\'+g\'$; $(c f)\'=c f\'$; $(fg)\'=f\'g+fg\'$; $(\\frac{f}{g})\'=\\frac{f\'g-fg\'}{g^2}$; $[f(g(x))]\'=f\'(g(x))g\'(x)$.' },
+        { id: 'b86', grade: 'III', tag: 'Analiză',
+          question: 'Derivata funcției inverse: $(f^{-1})\'(y_0)$.',
+          answer: '$(f^{-1})\'(y_0) = \\frac{1}{f\'(x_0)}$, unde $y_0=f(x_0)$.' },
+        { id: 'b87', grade: 'III', tag: 'Analiză',
+          question: 'Derivate uzuale: $(c)\'$, $(x^n)\'$, $(e^x)\'$, $(a^x)\'$, $(\\ln x)\'$, $(\\log_a x)\'$.',
+          answer: '$(c)\'=0$; $(x^n)\'=nx^{n-1}$; $(e^x)\'=e^x$; $(a^x)\'=a^x\\ln a$; $(\\ln x)\'=\\frac1x$; $(\\log_a x)\'=\\frac{1}{x\\ln a}$.' },
+        { id: 'b88', grade: 'III', tag: 'Analiză',
+          question: 'Derivate uzuale: $(\\sin x)\'$, $(\\cos x)\'$, $(\\tan x)\'$, $(\\arcsin x)\'$, $(\\arctan x)\'$.',
+          answer: '$(\\sin x)\'=\\cos x$; $(\\cos x)\'=-\\sin x$; $(\\tan x)\'=\\frac{1}{\\cos^2 x}=1+\\tan^2 x$; $(\\arcsin x)\'=\\frac{1}{\\sqrt{1-x^2}}$; $(\\arctan x)\'=\\frac{1}{1+x^2}$.' },
+        { id: 'b89', grade: 'III', tag: 'Analiză',
+          question: 'Ecuația tangentei la graficul lui $f$ în $x_0$:',
+          answer: '$y - f(x_0)=f\'(x_0)(x-x_0)$.' },
+        { id: 'b90', grade: 'III', tag: 'Analiză',
+          question: 'Asimptotă orizontală: definiție.',
+          answer: '$y=L$ este asimptotă orizontală dacă $\\lim_{x\\to\\pm\\infty} f(x) = L \\in \\mathbb{R}$.' },
+        { id: 'b91', grade: 'III', tag: 'Analiză',
+          question: 'Asimptotă verticală: definiție.',
+          answer: '$x=a$ este asimptotă verticală dacă $\\lim_{x\\to a^\\pm} f(x) = \\pm\\infty$.' },
+        { id: 'b92', grade: 'III', tag: 'Analiză',
+          question: 'Asimptotă oblică: $y=mx+n$. Cum se calculează $m$ și $n$?',
+          answer: '$m = \\lim_{x\\to\\infty} \\frac{f(x)}{x}$; $n = \\lim_{x\\to\\infty} [f(x) - mx]$.' },
+        { id: 'b93', grade: 'III', tag: 'Analiză',
+          question: 'Limita fundamentală: $\\lim_{x\\to0} \\frac{\\sin x}{x}$.',
+          answer: '$\\lim_{x\\to0} \\frac{\\sin x}{x} = 1$.' },
+        { id: 'b94', grade: 'III', tag: 'Analiză',
+          question: 'Limita fundamentală: $\\lim_{x\\to0} \\frac{e^x-1}{x}$.',
+          answer: '$\\lim_{x\\to0} \\frac{e^x-1}{x} = 1$.' },
+        { id: 'b95', grade: 'III', tag: 'Analiză',
+          question: 'Limita fundamentală: $\\lim_{x\\to\\infty} \\left(1+\\frac{1}{x}\\right)^x$ și $\\lim_{x\\to\\infty} \\left(1+\\frac{a}{x}\\right)^x$.',
+          answer: '$\\lim_{x\\to\\infty} \\left(1+\\frac{1}{x}\\right)^x = e$; $\\lim_{x\\to\\infty} \\left(1+\\frac{a}{x}\\right)^x = e^a$.' },
+        { id: 'b96', grade: 'III', tag: 'Analiză',
+          question: 'Regula lui L\'Hospital: cazul $\\frac{0}{0}$ sau $\\frac{\\infty}{\\infty}$.',
+          answer: '$\\lim_{x\\to a} \\frac{f(x)}{g(x)} = \\lim_{x\\to a} \\frac{f\'(x)}{g\'(x)}$ (dacă limitele există).' },
+        { id: 'b97', grade: 'III', tag: 'Analiză',
+          question: 'Definiția primitivei: $F$ este primitivă pentru $f$ pe $D$.',
+          answer: '$F$ este derivabilă pe $D$ și $F\'(x)=f(x)$, $\\forall x\\in D$.' },
+        { id: 'b98', grade: 'III', tag: 'Analiză',
+          question: 'Teorema: orice funcție continuă admite primitive.',
+          answer: 'Da, orice funcție continuă pe un interval admite primitive.' },
+        { id: 'b99', grade: 'III', tag: 'Analiză',
+          question: 'Formula Leibniz-Newton: $\\int_a^b f(x) dx = F(b)-F(a)$.',
+          answer: 'Unde $F$ este o primitivă a lui $f$ (adică $F\'=f$).' },
+        { id: 'b100', grade: 'III', tag: 'Analiză',
+          question: 'Integrale nedefinite uzuale: $\\int x^n dx$, $\\int \\frac1x dx$, $\\int e^x dx$, $\\int a^x dx$.',
+          answer: '$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$ ($n\\ne-1$); $\\int \\frac1x dx = \\ln|x|+C$; $\\int e^x dx=e^x+C$; $\\int a^x dx = \\frac{a^x}{\\ln a}+C$.' },
+        { id: 'b101', grade: 'III', tag: 'Analiză',
+          question: 'Integrale nedefinite uzuale: $\\int \\sin x dx$, $\\int \\cos x dx$, $\\int \\frac{1}{\\cos^2 x}dx$, $\\int \\frac{1}{\\sin^2 x}dx$.',
+          answer: '$\\int \\sin x dx = -\\cos x+C$; $\\int \\cos x dx = \\sin x+C$; $\\int \\frac{1}{\\cos^2 x}dx = \\tan x+C$; $\\int \\frac{1}{\\sin^2 x}dx = -\\cot x+C$.' },
+        { id: 'b102', grade: 'III', tag: 'Analiză',
+          question: 'Integrarea prin părți: formula.',
+          answer: '$\\int f(x)g\'(x)dx = f(x)g(x) - \\int f\'(x)g(x)dx$.' },
+        { id: 'b103', grade: 'III', tag: 'Analiză',
+          question: 'Schimbarea de variabilă: formula.',
+          answer: '$\\int f(g(x))g\'(x)dx = \\int f(t)dt$, cu $t=g(x)$.' },
+        { id: 'b104', grade: 'III', tag: 'Analiză',
+          question: 'Aria suprafeței plane delimitate de graficul lui $f$ și axa $Ox$: formula.',
+          answer: '$A = \\int_a^b |f(x)| dx$.' },
+        { id: 'b105', grade: 'III', tag: 'Analiză',
+          question: 'Volumul corpului de rotație generat de $f$ în jurul axei $Ox$: formula.',
+          answer: '$V = \\pi \\int_a^b f^2(x) dx$.' }
+    ];
+
+    // ============================================================
+    // LOGICA APLICAȚIEI (IDEM CU CELELALTE VERSIUNI)
+    // ============================================================
+    let cardsData = baseCardsData;
+    let filteredCards = [...cardsData];
+    let currentIndex = 0;
+    let showingAnswer = false;
+    let unlearnedOnly = false;
+
+    const STORAGE_KEY = 'anki_matematica_bac_learned_v1';
+    const THEME_KEY = 'anki_matematica_bac_theme_v1';
+
+    function loadLearned() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) return new Set(JSON.parse(raw));
+        } catch (e) { /* localStorage indisponibil */ }
+        return new Set();
+    }
+
+    function saveLearned() {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([...learnedSet]));
+        } catch (e) {}
+    }
+
+    const learnedSet = loadLearned();
+
+    const cardTag = document.getElementById('cardTag');
+    const cardGrade = document.getElementById('cardGrade');
+    const cardQuestion = document.getElementById('cardQuestion');
+    const cardAnswer = document.getElementById('cardAnswer');
+    const cardId = document.getElementById('cardId');
+    const cardSource = document.getElementById('cardSource');
+    const cardCounter = document.getElementById('cardCounter');
+    const learnedCount = document.getElementById('learnedCount');
+    const srsDueCount = document.getElementById('srsDueCount');
+    const tagDisplay = document.getElementById('tagDisplay');
+    const progressFill = document.getElementById('progressFill');
+    const totalCardsStat = document.getElementById('totalCardsStat');
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const showAnswerBtn = document.getElementById('showAnswerBtn');
+    const learnedBtn = document.getElementById('learnedBtn');
+    const resetLearnedBtn = document.getElementById('resetLearnedBtn');
+    const tagFilter = document.getElementById('tagFilter');
+    const gradeFilter = document.getElementById('gradeFilter');
+    const searchInput = document.getElementById('searchInput');
+    const flashcard = document.getElementById('flashcard');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const unlearnedBtn = document.getElementById('unlearnedBtn');
+    const themeToggle = document.getElementById('themeToggle');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const focusExitBtn = document.getElementById('focusExitBtn');
+    const appEl = document.getElementById('app');
+
+    let touchStartX = 0, touchStartY = 0;
+
+    function hasLatex(text) { return /\$[^$]+\$|\\\[|\\\(/.test(text); }
+
+    function renderLatex(element) {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            window.MathJax.typesetPromise([element]).catch(() => {});
+        }
+    }
+
+    // SRS
+    const SRS_KEY = 'anki_matematica_bac_srs_v1';
+    const DAY_MS = 86400000;
+    function todayDayNum() { return Math.floor(Date.now() / DAY_MS); }
+    function loadSrsData() {
+        try { const raw = localStorage.getItem(SRS_KEY); if (raw) return JSON.parse(raw); } catch(e) {}
+        return {};
+    }
+    let srsData = loadSrsData();
+    function saveSrsData() { try { localStorage.setItem(SRS_KEY, JSON.stringify(srsData)); } catch(e) {} }
+    function getSrsState(id) { return srsData[id] || { ef: 2.5, interval: 0, reps: 0, due: todayDayNum() }; }
+    function isCardDue(id) { return getSrsState(id).due <= todayDayNum(); }
+    function computeNextSrsState(id, rating) {
+        const s = Object.assign({}, getSrsState(id));
+        switch(rating) {
+            case 'again': s.reps=0; s.interval=0; s.ef=Math.max(1.3,s.ef-0.2); break;
+            case 'hard': s.reps=Math.max(1,s.reps); s.interval=Math.max(1,Math.round(s.interval*1.2)); s.ef=Math.max(1.3,s.ef-0.15); break;
+            case 'good': s.reps+=1; if(s.reps===1)s.interval=1; else if(s.reps===2)s.interval=6; else s.interval=Math.round(s.interval*s.ef); break;
+            case 'easy': s.reps+=1; s.interval=s.reps<=1?4:Math.max(1,Math.round(s.interval*s.ef*1.3)); s.ef+=0.15; break;
+        }
+        s.due=todayDayNum()+Math.max(0,s.interval);
+        return s;
+    }
+    function formatIntervalPreview(id, rating) {
+        const days = computeNextSrsState(id, rating).interval;
+        if(days<=0) return 'azi';
+        if(days===1) return '1 zi';
+        if(days<30) return days+' zile';
+        if(days<365) return Math.round(days/30)+' luni';
+        return Math.round(days/365)+' ani';
+    }
+    function rateSrsState(id, rating) { srsData[id]=computeNextSrsState(id,rating); saveSrsData(); }
+    function srsPool() { return filteredCards.length>0?filteredCards:cardsData; }
+    function buildDueQueue(pool) { return pool.filter(c=>isCardDue(c.id)).sort((a,b)=>getSrsState(a.id).due-getSrsState(b.id).due); }
+    function updateSrsBadge() { if(srsDueCount) srsDueCount.textContent=buildDueQueue(srsPool()).length; }
+
+    function normalizeDiacritics(text) {
+        const map={'ă':'a','â':'a','î':'i','ș':'s','ț':'t','Ă':'A','Â':'A','Î':'I','Ș':'S','Ț':'T','á':'a','é':'e','í':'i','ó':'o','ú':'u','Á':'A','É':'E','Í':'I','Ó':'O','Ú':'U'};
+        return text.replace(/[ăâîșțĂÂÎȘȚáéíóúÁÉÍÓÚ]/g, m=>map[m]||m);
+    }
+
+    function gradeList(g) { return Array.isArray(g)?g:[g]; }
+    function formatGrades(g) { return 'Subiectul ' + gradeList(g).join('/'); }
+    function gradeMatchesFilter(g, filterVal) {
+        if(filterVal==='all') return true;
+        return gradeList(g).map(String).includes(String(filterVal));
+    }
+
+    function renderCard() {
+        if(filteredCards.length===0) {
+            cardTag.textContent='—'; cardGrade.textContent='';
+            cardQuestion.textContent='Niciun card nu corespunde filtrului.';
+            cardAnswer.innerHTML=''; cardAnswer.classList.add('hidden');
+            cardId.textContent='#0'; cardSource.textContent='';
+            showingAnswer=false; updateStats(); return;
+        }
+        if(currentIndex>=filteredCards.length) currentIndex=filteredCards.length-1;
+        if(currentIndex<0) currentIndex=0;
+        const card=filteredCards[currentIndex];
+        cardTag.textContent=card.tag||'General';
+        cardGrade.textContent=formatGrades(card.grade);
+        cardQuestion.innerHTML=card.question;
+        cardAnswer.innerHTML=card.answer;
+        cardAnswer.classList.add('hidden');
+        showingAnswer=false;
+        cardId.textContent='#'+card.id;
+        cardSource.textContent='Sinteză Teorie Bac';
+        updateStats();
+        setTimeout(()=>renderLatex(cardQuestion),50);
+    }
+
+    function updateStats() {
+        const total=filteredCards.length;
+        const learned=filteredCards.filter(c=>learnedSet.has(c.id)).length;
+        cardCounter.textContent=total>0?`${currentIndex+1}/${total}`:'0/0';
+        learnedCount.textContent=learned;
+        const progress=total>0?((learned/total)*100):0;
+        progressFill.style.width=`${Math.round(progress)}%`;
+        totalCardsStat.textContent=cardsData.length;
+        const tag=tagFilter.value;
+        tagDisplay.textContent=tag==='all'?'Toate':tag;
+        if(filteredCards.length>0) {
+            const card=filteredCards[currentIndex];
+            if(learnedSet.has(card.id)) { learnedBtn.textContent='⭐ Învățat ✓'; learnedBtn.classList.add('active'); }
+            else { learnedBtn.textContent='⭐ Învățat'; learnedBtn.classList.remove('active'); }
+        }
+        updateSrsBadge();
+    }
+
+    function toggleAnswer() {
+        if(filteredCards.length===0) return;
+        const ans=cardAnswer;
+        if(ans.classList.contains('hidden')) { ans.classList.remove('hidden'); showingAnswer=true; setTimeout(()=>renderLatex(ans),100); }
+        else { ans.classList.add('hidden'); showingAnswer=false; }
+    }
+
+    function nextCard() {
+        if(filteredCards.length===0) return;
+        if(currentIndex<filteredCards.length-1) { currentIndex++; renderCard(); }
+        else { currentIndex=0; renderCard(); }
+    }
+    function prevCard() {
+        if(filteredCards.length===0) return;
+        if(currentIndex>0) { currentIndex--; renderCard(); }
+        else { currentIndex=filteredCards.length-1; renderCard(); }
+    }
+    function toggleLearned() {
+        if(filteredCards.length===0) return;
+        const card=filteredCards[currentIndex];
+        if(learnedSet.has(card.id)) learnedSet.delete(card.id);
+        else learnedSet.add(card.id);
+        saveLearned();
+        if(unlearnedOnly) applyFilters();
+        else updateStats();
+    }
+    function resetLearned() {
+        if(!confirm('Sigur vrei să resetezi progresul?')) return;
+        learnedSet.clear(); saveLearned(); if(unlearnedOnly) applyFilters(); else updateStats();
+    }
+    function shuffleCards() {
+        for(let i=filteredCards.length-1; i>0; i--) {
+            const j=Math.floor(Math.random()*(i+1));
+            [filteredCards[i],filteredCards[j]]=[filteredCards[j],filteredCards[i]];
+        }
+        currentIndex=0; renderCard();
+    }
+    function toggleUnlearnedOnly() {
+        unlearnedOnly=!unlearnedOnly;
+        unlearnedBtn.classList.toggle('active-filter',unlearnedOnly);
+        applyFilters();
+    }
+
+    function applyTheme(dark) {
+        document.body.classList.toggle('dark',dark);
+        themeToggle.textContent=dark?'☀️ Mod luminos':'🌙 Mod întunecat';
+        try { localStorage.setItem(THEME_KEY, dark?'dark':'light'); } catch(e) {}
+    }
+    function toggleTheme() { applyTheme(!document.body.classList.contains('dark')); }
+
+    // Focus mode
+    function requestFS(el) { const fn=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen; if(fn) try{fn.call(el).catch(()=>{});}catch(e){} }
+    function exitFS() { const fn=document.exitFullscreen||document.webkitExitFullscreen||document.msExitFullscreen; if(fn) try{fn.call(document).catch(()=>{});}catch(e){} }
+    function isFocusMode() { return appEl.classList.contains('focus-mode'); }
+    function enterFocusMode() { appEl.classList.add('focus-mode'); document.body.classList.add('focus-mode-active'); focusExitBtn.classList.add('visible'); fullscreenBtn.textContent='⛶ Ieși din focus'; requestFS(document.documentElement); }
+    function exitFocusMode() { appEl.classList.remove('focus-mode'); document.body.classList.remove('focus-mode-active'); focusExitBtn.classList.remove('visible'); fullscreenBtn.textContent='⛶ Mod focus'; if(document.fullscreenElement||document.webkitFullscreenElement) exitFS(); }
+    function toggleFocusMode() { if(isFocusMode()) exitFocusMode(); else enterFocusMode(); }
+    ['fullscreenchange','webkitfullscreenchange'].forEach(evt=>{
+        document.addEventListener(evt,function(){ if(!document.fullscreenElement&&!document.webkitFullscreenElement&&isFocusMode()) exitFocusMode(); });
+    });
+
+    function applyFilters() {
+        const tag=tagFilter.value;
+        const grade=gradeFilter.value;
+        const search=searchInput.value.toLowerCase().trim();
+        filteredCards=cardsData.filter(c=>{
+            let matchTag=true; if(tag!=='all') matchTag=c.tag===tag;
+            let matchGrade=gradeMatchesFilter(c.grade,grade);
+            let matchSearch=true;
+            if(search) {
+                const qNormal=normalizeDiacritics(c.question.toLowerCase());
+                const aNormal=normalizeDiacritics(c.answer.toLowerCase());
+                const searchNormal=normalizeDiacritics(search);
+                matchSearch=qNormal.includes(searchNormal)||aNormal.includes(searchNormal);
+            }
+            let matchLearned=true;
+            if(unlearnedOnly) matchLearned=!learnedSet.has(c.id);
+            return matchTag&&matchGrade&&matchSearch&&matchLearned;
+        });
+        if(currentIndex>=filteredCards.length) currentIndex=Math.max(0,filteredCards.length-1);
+        if(filteredCards.length===0) currentIndex=0;
+        renderCard(); updateStats();
+    }
+
+    // Evenimente
+    flashcard.addEventListener('click',toggleAnswer);
+    flashcard.addEventListener('touchstart',(e)=>{ touchStartX=e.changedTouches[0].screenX; touchStartY=e.changedTouches[0].screenY; },{passive:true});
+    flashcard.addEventListener('touchend',(e)=>{
+        if(!touchStartX) return;
+        const dx=e.changedTouches[0].screenX-touchStartX;
+        const dy=e.changedTouches[0].screenY-touchStartY;
+        if(Math.abs(dx)>40 && Math.abs(dx)>Math.abs(dy)*1.2) { if(dx>0) prevCard(); else nextCard(); }
+        touchStartX=0; touchStartY=0;
+    },{passive:true});
+    showAnswerBtn.addEventListener('click',(e)=>{ e.stopPropagation(); toggleAnswer(); });
+    nextBtn.addEventListener('click',nextCard);
+    prevBtn.addEventListener('click',prevCard);
+    learnedBtn.addEventListener('click',toggleLearned);
+    resetLearnedBtn.addEventListener('click',resetLearned);
+    tagFilter.addEventListener('change',applyFilters);
+    gradeFilter.addEventListener('change',applyFilters);
+    searchInput.addEventListener('input',applyFilters);
+    searchInput.addEventListener('search',applyFilters);
+    shuffleBtn.addEventListener('click',shuffleCards);
+    unlearnedBtn.addEventListener('click',toggleUnlearnedOnly);
+    themeToggle.addEventListener('click',toggleTheme);
+    fullscreenBtn.addEventListener('click',toggleFocusMode);
+    focusExitBtn.addEventListener('click',exitFocusMode);
+
+    document.addEventListener('keydown',(e)=>{
+        if(e.key==='ArrowRight'){e.preventDefault();nextCard();}
+        else if(e.key==='ArrowLeft'){e.preventDefault();prevCard();}
+        else if(e.key===' '||e.key==='Enter'){e.preventDefault();toggleAnswer();}
+        else if(e.key==='l'||e.key==='L'){toggleLearned();}
+        else if(e.key==='r'||e.key==='R'){resetLearned();}
+        else if(e.key==='f'||e.key==='F'){toggleFocusMode();}
+        else if(e.key==='Escape'&&isFocusMode()){exitFocusMode();}
+    });
+
+    // ============ AUTOEVALUARE (QUIZ) ============
+    const QUIZ_HISTORY_KEY='anki_matematica_bac_quiz_history_v1';
+    const quizOverlay=document.getElementById('quizOverlay');
+    const quizSetup=document.getElementById('quizSetup');
+    const quizPlay=document.getElementById('quizPlay');
+    const quizResults=document.getElementById('quizResults');
+    const quizStartBtn=document.getElementById('quizStartBtn');
+    const quizCancelBtn=document.getElementById('quizCancelBtn');
+    const quizBeginBtn=document.getElementById('quizBeginBtn');
+    const quizCountOptions=document.getElementById('quizCountOptions');
+    const quizSetupInfo=document.getElementById('quizSetupInfo');
+    const quizBestScore=document.getElementById('quizBestScore');
+    const quizProgressText=document.getElementById('quizProgressText');
+    const quizScoreText=document.getElementById('quizScoreText');
+    const quizProgressFill=document.getElementById('quizProgressFill');
+    const quizTag=document.getElementById('quizTag');
+    const quizGrade=document.getElementById('quizGrade');
+    const quizQuestion=document.getElementById('quizQuestion');
+    const quizAnswer=document.getElementById('quizAnswer');
+    const quizShowAnswerRow=document.getElementById('quizShowAnswerRow');
+    const quizMarkRow=document.getElementById('quizMarkRow');
+    const quizShowAnswerBtn=document.getElementById('quizShowAnswerBtn');
+    const quizWrongBtn=document.getElementById('quizWrongBtn');
+    const quizRightBtn=document.getElementById('quizRightBtn');
+    const quizExitBtn=document.getElementById('quizExitBtn');
+    const quizResultScore=document.getElementById('quizResultScore');
+    const quizResultPercent=document.getElementById('quizResultPercent');
+    const quizResultBest=document.getElementById('quizResultBest');
+    const quizMissedWrap=document.getElementById('quizMissedWrap');
+    const quizMissedList=document.getElementById('quizMissedList');
+    const quizRetryMissedBtn=document.getElementById('quizRetryMissedBtn');
+    const quizRestartBtn=document.getElementById('quizRestartBtn');
+    const quizCloseBtn=document.getElementById('quizCloseBtn');
+
+    let quizPool=[], quizIndex=0, quizScore=0, quizAnswered=false, quizMissed=[];
+
+    function loadQuizHistory(){ try{const raw=localStorage.getItem(QUIZ_HISTORY_KEY); if(raw) return JSON.parse(raw);}catch(e){} return {}; }
+    function saveQuizBest(scopeKey,percent){ try{const hist=loadQuizHistory(); if(!hist[scopeKey]||percent>hist[scopeKey]){hist[scopeKey]=percent; localStorage.setItem(QUIZ_HISTORY_KEY,JSON.stringify(hist));}}catch(e){} }
+    function currentQuizScopeKey(){ return 'g'+gradeFilter.value+'_t'+tagFilter.value; }
+    function shuffleArray(a){ const arr=a.slice(); for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+    function openQuizSetup(){
+        const pool=filteredCards.length>0?filteredCards:cardsData;
+        const total=pool.length;
+        quizSetupInfo.textContent='Testul folosește filtrele active. Carduri disponibile: '+total+'.';
+        const hist=loadQuizHistory();
+        const best=hist[currentQuizScopeKey()];
+        if(best!==undefined){ quizBestScore.style.display='block'; quizBestScore.innerHTML='🏆 Recordul tău pentru acest filtru: <b>'+best+'%</b>'; }
+        else quizBestScore.style.display='none';
+        const options=[5,10,20,total].filter((n,idx,self)=>n>0&&n<=total&&self.indexOf(n)===idx);
+        quizCountOptions.innerHTML='';
+        let selectedCount=options.length?options[Math.min(1,options.length-1)]:total;
+        options.forEach(n=>{
+            const btn=document.createElement('button');
+            btn.className='quiz-count-btn'+(n===selectedCount?' active':'');
+            btn.textContent=(n===total)?('Toate ('+total+')'):String(n);
+            btn.dataset.count=n;
+            btn.addEventListener('click',function(){ Array.from(quizCountOptions.children).forEach(b=>b.classList.remove('active')); btn.classList.add('active'); selectedCount=n; });
+            quizCountOptions.appendChild(btn);
+        });
+        quizBeginBtn.onclick=function(){ if(total===0) return; startQuiz(shuffleArray(pool).slice(0,selectedCount)); };
+        quizSetup.style.display='block'; quizPlay.style.display='none'; quizResults.style.display='none'; quizOverlay.style.display='flex';
+    }
+
+    function startQuiz(pool){ quizPool=pool; quizIndex=0; quizScore=0; quizMissed=[]; quizSetup.style.display='none'; quizResults.style.display='none'; quizPlay.style.display='block'; renderQuizQuestion(); }
+
+    function renderQuizQuestion(){
+        quizAnswered=false;
+        const card=quizPool[quizIndex];
+        quizProgressText.textContent='Întrebarea '+(quizIndex+1)+'/'+quizPool.length;
+        quizScoreText.textContent='✓ '+quizScore;
+        quizProgressFill.style.width=((quizIndex)/quizPool.length*100)+'%';
+        quizTag.textContent=card.tag||'General';
+        quizGrade.textContent=formatGrades(card.grade);
+        quizQuestion.textContent=card.question;
+        quizAnswer.innerHTML=card.answer;
+        quizAnswer.classList.add('hidden');
+        quizShowAnswerRow.style.display='flex';
+        quizMarkRow.style.display='none';
+        renderLatex(quizQuestion);
+    }
+
+    function showQuizAnswer(){ quizAnswer.classList.remove('hidden'); renderLatex(quizAnswer); quizShowAnswerRow.style.display='none'; quizMarkRow.style.display='flex'; quizAnswered=true; }
+
+    function markQuizAnswer(correct){ if(!quizAnswered) return; const card=quizPool[quizIndex]; if(correct) quizScore++; else quizMissed.push(card); if(quizIndex+1<quizPool.length){ quizIndex++; renderQuizQuestion(); } else finishQuiz(); }
+
+    function finishQuiz(){
+        quizPlay.style.display='none'; quizResults.style.display='block';
+        const total=quizPool.length; const percent=total>0?Math.round((quizScore/total)*100):0;
+        quizResultScore.textContent=quizScore+'/'+total;
+        quizResultPercent.textContent=percent+'%';
+        const hist=loadQuizHistory(); const scopeKey=currentQuizScopeKey(); const prevBest=hist[scopeKey];
+        saveQuizBest(scopeKey,percent);
+        if(prevBest!==undefined && percent>prevBest){ quizResultBest.style.display='block'; quizResultBest.textContent='🎉 Record nou! (anterior: '+prevBest+'%)'; }
+        else if(prevBest===undefined){ quizResultBest.style.display='block'; quizResultBest.textContent='🏆 Primul tău record pentru acest filtru: '+percent+'%'; }
+        else { quizResultBest.style.display='none'; }
+        if(quizMissed.length>0){ quizMissedWrap.style.display='block'; quizMissedList.innerHTML=''; quizMissed.forEach(c=>{const div=document.createElement('div'); div.className='quiz-missed-item'; div.textContent=c.question; quizMissedList.appendChild(div);}); quizRetryMissedBtn.style.display='inline-block'; }
+        else { quizMissedWrap.style.display='none'; quizRetryMissedBtn.style.display='none'; }
+    }
+
+    function closeQuiz(){ quizOverlay.style.display='none'; }
+
+    quizStartBtn.addEventListener('click',openQuizSetup);
+    quizCancelBtn.addEventListener('click',closeQuiz);
+    quizCloseBtn.addEventListener('click',closeQuiz);
+    quizExitBtn.addEventListener('click',closeQuiz);
+    quizShowAnswerBtn.addEventListener('click',showQuizAnswer);
+    quizWrongBtn.addEventListener('click',function(){ markQuizAnswer(false); });
+    quizRightBtn.addEventListener('click',function(){ markQuizAnswer(true); });
+    quizRestartBtn.addEventListener('click',openQuizSetup);
+    quizRetryMissedBtn.addEventListener('click',function(){ startQuiz(shuffleArray(quizMissed)); });
+    quizOverlay.addEventListener('click',function(e){ if(e.target===quizOverlay) closeQuiz(); });
+
+    // ============ SRS ============
+    const srsOverlay=document.getElementById('srsOverlay');
+    const srsSetup=document.getElementById('srsSetup');
+    const srsPlay=document.getElementById('srsPlay');
+    const srsDone=document.getElementById('srsDone');
+    const srsStartBtn=document.getElementById('srsStartBtn');
+    const srsCancelBtn=document.getElementById('srsCancelBtn');
+    const srsBeginBtn=document.getElementById('srsBeginBtn');
+    const srsSetupInfo=document.getElementById('srsSetupInfo');
+    const srsProgressText=document.getElementById('srsProgressText');
+    const srsProgressFill=document.getElementById('srsProgressFill');
+    const srsTag=document.getElementById('srsTag');
+    const srsGrade=document.getElementById('srsGrade');
+    const srsQuestion=document.getElementById('srsQuestion');
+    const srsAnswer=document.getElementById('srsAnswer');
+    const srsShowAnswerRow=document.getElementById('srsShowAnswerRow');
+    const srsShowAnswerBtn=document.getElementById('srsShowAnswerBtn');
+    const srsRateRow=document.getElementById('srsRateRow');
+    const srsAgainBtn=document.getElementById('srsAgainBtn');
+    const srsHardBtn=document.getElementById('srsHardBtn');
+    const srsGoodBtn=document.getElementById('srsGoodBtn');
+    const srsEasyBtn=document.getElementById('srsEasyBtn');
+    const srsAgainPrev=document.getElementById('srsAgainPrev');
+    const srsHardPrev=document.getElementById('srsHardPrev');
+    const srsGoodPrev=document.getElementById('srsGoodPrev');
+    const srsEasyPrev=document.getElementById('srsEasyPrev');
+    const srsExitBtn=document.getElementById('srsExitBtn');
+    const srsDoneText=document.getElementById('srsDoneText');
+    const srsStudyExtraBtn=document.getElementById('srsStudyExtraBtn');
+    const srsCloseBtn=document.getElementById('srsCloseBtn');
+    let srsQueue=[], srsIdx=0, srsRatedCount=0;
+
+    function openSrsSetup(){
+        const due=buildDueQueue(srsPool());
+        srsSetupInfo.textContent=due.length>0?'📌 Ai '+due.length+' card(uri) de revizuit azi, din filtrul activ.' : '🎉 Nimic scadent azi din filtrul activ — poți studia oricum tot setul filtrat.';
+        srsBeginBtn.textContent=due.length>0?'Începe repetiția ▶':'Studiază tot filtrul ▶';
+        srsSetup.style.display='block'; srsPlay.style.display='none'; srsDone.style.display='none'; srsOverlay.style.display='flex';
+    }
+
+    function startSrsSession(){
+        const pool=srsPool();
+        let due=buildDueQueue(pool);
+        if(due.length===0) due=shuffleArray(pool);
+        srsQueue=due; srsIdx=0; srsRatedCount=0;
+        srsSetup.style.display='none'; srsDone.style.display='none'; srsPlay.style.display='block'; renderSrsCard();
+    }
+
+    function renderSrsCard(){
+        const card=srsQueue[srsIdx];
+        srsProgressText.textContent='Cardul '+(srsIdx+1)+'/'+srsQueue.length;
+        srsProgressFill.style.width=(srsIdx/srsQueue.length*100)+'%';
+        srsTag.textContent=card.tag||'General';
+        srsGrade.textContent=formatGrades(card.grade);
+        srsQuestion.textContent=card.question;
+        srsAnswer.innerHTML=card.answer;
+        srsAnswer.classList.add('hidden');
+        srsShowAnswerRow.style.display='flex';
+        srsRateRow.style.display='none';
+        renderLatex(srsQuestion);
+    }
+
+    function showSrsAnswer(){
+        srsAnswer.classList.remove('hidden'); renderLatex(srsAnswer);
+        srsShowAnswerRow.style.display='none'; srsRateRow.style.display='flex';
+        const card=srsQueue[srsIdx];
+        srsAgainPrev.textContent=formatIntervalPreview(card.id,'again');
+        srsHardPrev.textContent=formatIntervalPreview(card.id,'hard');
+        srsGoodPrev.textContent=formatIntervalPreview(card.id,'good');
+        srsEasyPrev.textContent=formatIntervalPreview(card.id,'easy');
+    }
+
+    function rateSrsCard(rating){
+        const card=srsQueue[srsIdx];
+        rateSrsState(card.id,rating);
+        srsRatedCount++;
+        if(rating==='again') srsQueue.push(card);
+        updateSrsBadge();
+        if(srsIdx+1<srsQueue.length){ srsIdx++; renderSrsCard(); }
+        else finishSrsSession();
+    }
+
+    function finishSrsSession(){
+        srsPlay.style.display='none'; srsDone.style.display='block';
+        srsDoneText.textContent='✅ Ai revizuit '+srsRatedCount+' card(uri) azi. Revino mâine pentru următoarea rundă!';
+        const pool=srsPool(); const stillDue=buildDueQueue(pool).length;
+        srsStudyExtraBtn.style.display=(stillDue===0&&pool.length>srsRatedCount)?'inline-block':'none';
+        updateSrsBadge();
+    }
+
+    function closeSrsOverlay(){ srsOverlay.style.display='none'; updateSrsBadge(); }
+
+    srsStartBtn.addEventListener('click',openSrsSetup);
+    srsCancelBtn.addEventListener('click',closeSrsOverlay);
+    srsCloseBtn.addEventListener('click',closeSrsOverlay);
+    srsExitBtn.addEventListener('click',closeSrsOverlay);
+    srsBeginBtn.addEventListener('click',startSrsSession);
+    srsShowAnswerBtn.addEventListener('click',showSrsAnswer);
+    srsAgainBtn.addEventListener('click',function(){ rateSrsCard('again'); });
+    srsHardBtn.addEventListener('click',function(){ rateSrsCard('hard'); });
+    srsGoodBtn.addEventListener('click',function(){ rateSrsCard('good'); });
+    srsEasyBtn.addEventListener('click',function(){ rateSrsCard('easy'); });
+    srsStudyExtraBtn.addEventListener('click',function(){ srsQueue=shuffleArray(srsPool()); srsIdx=0; srsRatedCount=0; srsDone.style.display='none'; srsPlay.style.display='block'; renderSrsCard(); });
+    srsOverlay.addEventListener('click',function(e){ if(e.target===srsOverlay) closeSrsOverlay(); });
+
+    // ============ INIȚIALIZARE ============
+    try { const savedTheme=localStorage.getItem(THEME_KEY); if(savedTheme==='dark') applyTheme(true); else if(!savedTheme&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme(true); } catch(e) {}
+    renderCard(); updateStats();
+    window.addEventListener('load', ()=>{ if(window.MathJax) window.MathJax.typesetPromise().catch(()=>{}); });
+    const observer = new MutationObserver(()=>{ if(!cardAnswer.classList.contains('hidden')) renderLatex(cardAnswer); });
+    observer.observe(cardAnswer, { attributes: true, attributeFilter: ['class'] });
+</script>
+</body>
+</html>
