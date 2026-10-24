@@ -598,6 +598,67 @@ mjx-container svg {
         @media (max-width: 480px) {
             .focus-exit-btn { top: 8px; right: 8px; padding: 6px 12px; font-size: 0.7rem; }
         }
+        /* ===== TEST GRILĂ (4 VARIANTE) ===== */
+        .mcq-options { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+        .mcq-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            text-align: left;
+            background: white;
+            border: 2px solid #d6e0ec;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            color: #1d3f5c;
+            cursor: pointer;
+            line-height: 1.5;
+            transition: border-color 0.15s, background 0.15s;
+            touch-action: manipulation;
+        }
+        .mcq-option .mcq-letter {
+            flex: 0 0 auto;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #e8eef7;
+            color: #1d3f5c;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mcq-option .mcq-text { flex: 1; min-width: 0; overflow-x: auto; }
+        .mcq-option .mcq-mark { flex: 0 0 auto; font-weight: 800; font-size: 1rem; }
+        .mcq-option:disabled { cursor: default; }
+        .mcq-option.correct { border-color: #1d6b3e; background: #e6f4ea; }
+        .mcq-option.correct .mcq-letter { background: #1d6b3e; color: white; }
+        .mcq-option.wrong { border-color: #a13a3a; background: #fbeeee; }
+        .mcq-option.wrong .mcq-letter { background: #a13a3a; color: white; }
+        .mcq-option.dimmed { opacity: 0.55; }
+        @media (hover: hover) {
+            .mcq-option:not(:disabled):hover { border-color: #3b7bb7; background: #f3f8fe; }
+        }
+        .mcq-feedback { margin-top: 12px; font-weight: 700; font-size: 0.85rem; }
+        .mcq-feedback.ok { color: #1d6b3e; }
+        .mcq-feedback.ko { color: #a13a3a; }
+        .mcq-explain-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #5c7089; margin-bottom: 4px; }
+        .mcq-missed-answer { display: block; margin-top: 4px; color: #1d6b3e; font-weight: 600; }
+        body.dark .mcq-option { background: #131d2b; border-color: #2c3d54; color: #dbe7f3; }
+        body.dark .mcq-option .mcq-letter { background: #253549; color: #dbe7f3; }
+        body.dark .mcq-option.correct { background: #15301f; border-color: #3d8a5f; }
+        body.dark .mcq-option.correct .mcq-letter { background: #3d8a5f; }
+        body.dark .mcq-option.wrong { background: #2f1a1a; border-color: #c25555; }
+        body.dark .mcq-option.wrong .mcq-letter { background: #c25555; }
+        body.dark .mcq-feedback.ok { color: #6fcf97; }
+        body.dark .mcq-feedback.ko { color: #f08a8a; }
+        body.dark .mcq-missed-answer { color: #6fcf97; }
+        @media (hover: hover) {
+            body.dark .mcq-option:not(:disabled):hover { background: #1a2738; border-color: #4a90c9; }
+        }
     </style>
 </head>
 <body>
@@ -630,7 +691,9 @@ mjx-container svg {
             <option value="all">Toate</option>
             <option value="Algebră">Algebră</option>
             <option value="Geometrie plană">Geometrie plană</option>
-            <option value="Geometrie spațiu">Geometrie spațiu</option>
+            <option value="Trigonometrie">Trigonometrie</option>
+            <option value="Vectori">Vectori</option>
+            <option value="Numere complexe">Numere complexe</option>
             <option value="Algebră superioară">Algebră superioară</option>
             <option value="Analiză">Analiză</option>
         </select>
@@ -638,6 +701,7 @@ mjx-container svg {
         <button id="shuffleBtn" class="pill-btn">🔀 Amestecă</button>
         <button id="unlearnedBtn" class="pill-btn">📌 Doar neînvățate</button>
         <button id="quizStartBtn" class="pill-btn primary">📝 Autoevaluare</button>
+        <button id="mcqStartBtn" class="pill-btn primary" style="background:#7a3d8f; border-color:#7a3d8f;">🎯 Test grilă</button>
         <button id="srsStartBtn" class="pill-btn primary" style="background:#1d6b3e; border-color:#1d6b3e;">🧠 Repetiție</button>
         <button id="resetLearnedBtn" class="pill-btn">Reset învățate</button>
     </div>
@@ -734,6 +798,68 @@ mjx-container svg {
                 <button id="quizRetryMissedBtn" class="quiz-btn quiz-btn-secondary" style="display:none;">🔁 Reia greșelile</button>
                 <button id="quizRestartBtn" class="quiz-btn quiz-btn-secondary">↺ Test nou</button>
                 <button id="quizCloseBtn" class="quiz-btn quiz-btn-primary">Închide</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ============ TEST GRILĂ (4 VARIANTE) ============ -->
+<div class="quiz-overlay" id="mcqOverlay" style="display:none;">
+    <div class="quiz-box" id="mcqBox">
+
+        <!-- Ecran 1: Setare test -->
+        <div id="mcqSetup">
+            <h2 style="margin:0 0 6px 0; font-size:1.15rem;">🎯 Test grilă</h2>
+            <p id="mcqSetupInfo" style="margin:0 0 6px 0; font-size:0.8rem; color:#5c7089;"></p>
+            <p style="margin:0 0 16px 0; font-size:0.72rem; color:#8098b3;">Fiecare întrebare are 4 variante de răspuns, dintre care una singură este corectă. Testul folosește filtrele active (subiect / capitol / căutare).</p>
+            <div id="mcqBestScore" style="font-size:0.75rem; margin-bottom:14px; display:none;"></div>
+            <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:8px;">Câte întrebări?</label>
+            <div id="mcqCountOptions" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"></div>
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button id="mcqCancelBtn" class="quiz-btn quiz-btn-secondary">Anulează</button>
+                <button id="mcqBeginBtn" class="quiz-btn quiz-btn-primary">Start test ▶</button>
+            </div>
+        </div>
+
+        <!-- Ecran 2: Test în desfășurare -->
+        <div id="mcqPlay" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span id="mcqProgressText" style="font-size:0.75rem; font-weight:600; color:#5c7089;">Întrebarea 1/10</span>
+                <span id="mcqScoreText" style="font-size:0.75rem; font-weight:600; color:#1d6b3e;">✓ 0</span>
+            </div>
+            <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="mcqProgressFill"></div></div>
+            <div class="quiz-card">
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <div class="card-tag" id="mcqTag" style="margin-bottom:0;"></div>
+                    <div class="card-tag" id="mcqGrade" style="margin-bottom:0;"></div>
+                </div>
+                <div class="quiz-question" id="mcqQuestion"></div>
+                <div class="mcq-options" id="mcqOptions" role="group" aria-label="Variante de răspuns"></div>
+                <div class="mcq-feedback" id="mcqFeedback" aria-live="polite"></div>
+                <div class="quiz-answer hidden" id="mcqExplain"></div>
+            </div>
+            <div style="display:flex; justify-content:center; margin-top:16px;">
+                <button id="mcqNextBtn" class="quiz-btn quiz-btn-primary" style="min-width:220px; display:none;">Următoarea întrebare ▶</button>
+            </div>
+            <button id="mcqExitBtn" style="margin-top:18px; background:none; border:none; color:#8098b3; font-size:0.7rem; cursor:pointer; text-decoration:underline;">Ieși din test</button>
+        </div>
+
+        <!-- Ecran 3: Rezultate -->
+        <div id="mcqResults" style="display:none;">
+            <h2 style="margin:0 0 4px 0; font-size:1.15rem;">🏁 Rezultat test grilă</h2>
+            <div id="mcqResultScore" style="font-size:2.2rem; font-weight:800; margin:10px 0 4px 0; text-align:center;"></div>
+            <div id="mcqResultPercent" style="text-align:center; font-size:0.85rem; color:#5c7089; margin-bottom:6px;"></div>
+            <div id="mcqResultGrade" style="text-align:center; font-size:0.8rem; font-weight:600; margin-bottom:6px;"></div>
+            <div id="mcqResultBest" style="text-align:center; font-size:0.72rem; color:#1d6b3e; margin-bottom:16px; display:none;"></div>
+            <div id="mcqMissedWrap" style="display:none; margin-bottom:16px;">
+                <div style="font-size:0.75rem; font-weight:700; margin-bottom:8px; color:#a13a3a;">Greșeli de revizuit:</div>
+                <div id="mcqMissedList" class="quiz-missed-list"></div>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+                <button id="mcqRetryMissedBtn" class="quiz-btn quiz-btn-secondary" style="display:none;">🔁 Reia greșelile</button>
+                <button id="mcqRestartBtn" class="quiz-btn quiz-btn-secondary">↺ Test nou</button>
+                <button id="mcqCloseBtn" class="quiz-btn quiz-btn-primary">Închide</button>
             </div>
         </div>
 
@@ -840,7 +966,7 @@ mjx-container svg {
           answer: '$f(x)<0$ pentru $x<-\\frac{b}{a}$; $f(x)=0$ pentru $x=-\\frac{b}{a}$; $f(x)>0$ pentru $x>-\\frac{b}{a}$.' },
         { id: 'b13', grade: 'I', tag: 'Algebră',
           question: 'Definiții: funcție pară, impară, periodică.',
-          answer: 'Pară: $f(-x)=f(x)$. Impară: $f(-x)=-f(x)$. Periodică de perioadă $K$: $f(x+K)=f(x)$.' },
+          answer: 'Pară: $f(-x)=f(x)$. Impară: $f(-x)=-f(x)$. Periodică de perioadă $K \\neq 0$: $f(x+K)=f(x)$, $\\forall x$.' },
         { id: 'b14', grade: 'I', tag: 'Algebră',
           question: 'Când o funcție este inversabilă?',
           answer: '$f$ este inversabilă $\\iff$ este bijectivă (injectivă și surjectivă).' },
@@ -861,13 +987,13 @@ mjx-container svg {
           answer: 'C.E.: $f(x)\\ge0$, $g(x)\\ge0$. Se ridică la pătrat: $f(x)=[g(x)]^2$. Soluțiile se verifică.' },
         { id: 'b20', grade: 'I', tag: 'Algebră',
           question: 'Ecuații exponențiale: $a^{f(x)} = a^{g(x)}$.',
-          answer: '$a^{f(x)} = a^{g(x)} \\iff f(x)=g(x)$ (deoarece funcția exponențială este injectivă).' },
+          answer: 'Pentru $a>0$, $a\\neq1$: $a^{f(x)} = a^{g(x)} \\iff f(x)=g(x)$ (deoarece funcția exponențială este injectivă).' },
         { id: 'b21', grade: 'I', tag: 'Algebră',
           question: 'Monotonia funcției exponențiale $f(x)=a^x$ ($a>0, a\\neq1$).',
           answer: 'Dacă $a\\in(0,1)$: strict descrescătoare. Dacă $a\\in(1,\\infty)$: strict crescătoare.' },
         { id: 'b22', grade: 'I', tag: 'Algebră',
           question: 'Proprietăți fundamentale ale logaritmilor: $\\log_a x + \\log_a y$; $\\log_a x - \\log_a y$; $\\log_a x^k$.',
-          answer: '$\\log_a x + \\log_a y = \\log_a(xy)$; $\\log_a x - \\log_a y = \\log_a\\frac{x}{y}$; $\\log_a x^k = k\\log_a x$.' },
+          answer: 'Pentru $a>0$, $a\\neq1$, $x,y>0$: $\\log_a x + \\log_a y = \\log_a(xy)$; $\\log_a x - \\log_a y = \\log_a\\frac{x}{y}$; $\\log_a x^k = k\\log_a x$.' },
         { id: 'b23', grade: 'I', tag: 'Algebră',
           question: 'Formula de schimbare a bazei pentru logaritmi.',
           answer: '$\\log_a b = \\frac{\\log_c b}{\\log_c a} = \\frac{1}{\\log_b a}$.' },
@@ -899,7 +1025,7 @@ mjx-container svg {
           question: 'Numărul de funcții strict crescătoare $f:M\\to N$ ($m\\le n$).',
           answer: '$C_n^m = \\frac{n!}{m!(n-m)!}$.' },
         { id: 'b33', grade: 'I', tag: 'Algebră',
-          question: 'Numărul de funcții strict monotone $f:M\\to N$ ($m\\le n$).',
+          question: 'Numărul de funcții strict monotone $f:M\\to N$ ($2\\le m\\le n$).',
           answer: '$2\\cdot C_n^m$.' },
         { id: 'b34', grade: 'I', tag: 'Algebră',
           question: 'Numărul de submulțimi ale unei mulțimi cu $n$ elemente.',
@@ -942,7 +1068,7 @@ mjx-container svg {
           answer: '$\\sin^2 x + \\cos^2 x = 1$; $\\tan x = \\frac{\\sin x}{\\cos x}$; $\\cot x = \\frac{\\cos x}{\\sin x}$; $\\tan x\\cdot\\cot x = 1$.' },
         { id: 'b47', grade: 'I', tag: 'Trigonometrie',
           question: 'Valori remarcabile: $\\sin 30^\\circ, \\sin 45^\\circ, \\sin 60^\\circ$; $\\cos 30^\\circ, \\cos 45^\\circ, \\cos 60^\\circ$.',
-          answer: '$\\sin 30=\\frac12,\\ \\sin 45=\\frac{\\sqrt2}{2},\\ \\sin 60=\\frac{\\sqrt3}{2}$; $\\cos 30=\\frac{\\sqrt3}{2},\\ \\cos 45=\\frac{\\sqrt2}{2},\\ \\cos 60=\\frac12$.' },
+          answer: '$\\sin 30^\\circ=\\frac12,\\ \\sin 45^\\circ=\\frac{\\sqrt2}{2},\\ \\sin 60^\\circ=\\frac{\\sqrt3}{2}$; $\\cos 30^\\circ=\\frac{\\sqrt3}{2},\\ \\cos 45^\\circ=\\frac{\\sqrt2}{2},\\ \\cos 60^\\circ=\\frac12$.' },
         { id: 'b48', grade: 'I', tag: 'Trigonometrie',
           question: 'Formule: $\\sin(a+b)$, $\\sin(a-b)$, $\\cos(a+b)$, $\\cos(a-b)$.',
           answer: '$\\sin(a\\pm b)=\\sin a\\cos b \\pm \\cos a\\sin b$; $\\cos(a\\pm b)=\\cos a\\cos b \\mp \\sin a\\sin b$.' },
@@ -951,7 +1077,7 @@ mjx-container svg {
           answer: '$\\sin 2a = 2\\sin a\\cos a$; $\\cos 2a = \\cos^2 a - \\sin^2 a = 2\\cos^2 a -1 = 1-2\\sin^2 a$.' },
         { id: 'b50', grade: 'I', tag: 'Trigonometrie',
           question: 'Ecuații trigonometrice fundamentale: $\\sin x = a$, $\\cos x = a$ ($|a|\\le1$).',
-          answer: '$\\sin x = a \\Rightarrow x = (-1)^k\\arcsin a + k\\pi$; $\\cos x = a \\Rightarrow x = \\pm\\arccos a + 2k\\pi$.' },
+          answer: '$\\sin x = a \\Rightarrow x = (-1)^k\\arcsin a + k\\pi$; $\\cos x = a \\Rightarrow x = \\pm\\arccos a + 2k\\pi$, cu $k \\in \\mathbb{Z}$.' },
         { id: 'b51', grade: 'I', tag: 'Trigonometrie',
           question: 'Teorema cosinusului într-un triunghi.',
           answer: '$a^2 = b^2 + c^2 - 2bc\\cos A$.' },
@@ -1034,10 +1160,10 @@ mjx-container svg {
           answer: '$R = P(a)$.' },
         { id: 'b77', grade: 'II', tag: 'Algebră superioară',
           question: 'Rădăcinile întregi ale unei ecuații algebrice cu coeficienți în $\\mathbb{Z}$.',
-          answer: 'Sunt divizorii termenului liber.' },
+          answer: 'Se află printre divizorii termenului liber (se verifică fiecare divizor; nu toți sunt neapărat rădăcini).' },
         { id: 'b78', grade: 'II', tag: 'Algebră superioară',
           question: 'Rădăcinile raționale ale unei ecuații algebrice cu coeficienți în $\\mathbb{Z}$: forma $\\frac{p}{q}$.',
-          answer: '$p$ divide termenul liber, $q$ divide coeficientul dominant.' },
+          answer: 'Dacă $\\frac{p}{q}$ (ireductibilă) este rădăcină, atunci $p$ divide termenul liber și $q$ divide coeficientul dominant.' },
         { id: 'b79', grade: 'II', tag: 'Algebră superioară',
           question: 'Relațiile lui Viète pentru $ax^3+bx^2+cx+d=0$: sumă, sumă produse 2 câte 2, produs.',
           answer: '$x_1+x_2+x_3 = -\\frac{b}{a}$; $x_1x_2+x_1x_3+x_2x_3 = \\frac{c}{a}$; $x_1x_2x_3 = -\\frac{d}{a}$.' },
@@ -1050,7 +1176,7 @@ mjx-container svg {
           answer: '$f\'(x_0) = \\lim_{x\\to x_0} \\frac{f(x)-f(x_0)}{x-x_0}$.' },
         { id: 'b82', grade: 'III', tag: 'Analiză',
           question: 'Teorema lui Fermat: condiția pentru punct de extrem local.',
-          answer: 'Dacă $f$ este derivabilă în $x_0$ și $x_0$ este punct de extrem local, atunci $f\'(x_0)=0$.' },
+          answer: 'Dacă $f:I\\to\\mathbb{R}$ este derivabilă în $x_0$ și $x_0$ este punct de extrem local situat în interiorul intervalului $I$, atunci $f\'(x_0)=0$.' },
         { id: 'b83', grade: 'III', tag: 'Analiză',
           question: 'Teorema lui Lagrange (a creșterilor finite).',
           answer: 'Fie $f:[a,b]\\to\\mathbb{R}$ continuă, derivabilă pe $(a,b)$. Atunci $\\exists c\\in(a,b)$ a.î. $f\'(c)=\\frac{f(b)-f(a)}{b-a}$.' },
@@ -1062,7 +1188,7 @@ mjx-container svg {
           answer: '$(f+g)\'=f\'+g\'$; $(c f)\'=c f\'$; $(fg)\'=f\'g+fg\'$; $(\\frac{f}{g})\'=\\frac{f\'g-fg\'}{g^2}$; $[f(g(x))]\'=f\'(g(x))g\'(x)$.' },
         { id: 'b86', grade: 'III', tag: 'Analiză',
           question: 'Derivata funcției inverse: $(f^{-1})\'(y_0)$.',
-          answer: '$(f^{-1})\'(y_0) = \\frac{1}{f\'(x_0)}$, unde $y_0=f(x_0)$.' },
+          answer: '$(f^{-1})\'(y_0) = \\frac{1}{f\'(x_0)}$, unde $y_0=f(x_0)$ și $f\'(x_0)\\neq0$ ($f$ bijectivă, continuă, derivabilă în $x_0$).' },
         { id: 'b87', grade: 'III', tag: 'Analiză',
           question: 'Derivate uzuale: $(c)\'$, $(x^n)\'$, $(e^x)\'$, $(a^x)\'$, $(\\ln x)\'$, $(\\log_a x)\'$.',
           answer: '$(c)\'=0$; $(x^n)\'=nx^{n-1}$; $(e^x)\'=e^x$; $(a^x)\'=a^x\\ln a$; $(\\ln x)\'=\\frac1x$; $(\\log_a x)\'=\\frac{1}{x\\ln a}$.' },
@@ -1077,10 +1203,10 @@ mjx-container svg {
           answer: '$y=L$ este asimptotă orizontală dacă $\\lim_{x\\to\\pm\\infty} f(x) = L \\in \\mathbb{R}$.' },
         { id: 'b91', grade: 'III', tag: 'Analiză',
           question: 'Asimptotă verticală: definiție.',
-          answer: '$x=a$ este asimptotă verticală dacă $\\lim_{x\\to a^\\pm} f(x) = \\pm\\infty$.' },
+          answer: '$x=a$ este asimptotă verticală dacă cel puțin una dintre limitele laterale $\\lim_{x\\to a^-} f(x)$, $\\lim_{x\\to a^+} f(x)$ este $+\\infty$ sau $-\\infty$.' },
         { id: 'b92', grade: 'III', tag: 'Analiză',
           question: 'Asimptotă oblică: $y=mx+n$. Cum se calculează $m$ și $n$?',
-          answer: '$m = \\lim_{x\\to\\infty} \\frac{f(x)}{x}$; $n = \\lim_{x\\to\\infty} [f(x) - mx]$.' },
+          answer: '$m = \\lim_{x\\to\\infty} \\frac{f(x)}{x}$; $n = \\lim_{x\\to\\infty} [f(x) - mx]$. Asimptota oblică există dacă $m \\in \\mathbb{R}^*$ și $n \\in \\mathbb{R}$ (analog spre $-\\infty$).' },
         { id: 'b93', grade: 'III', tag: 'Analiză',
           question: 'Limita fundamentală: $\\lim_{x\\to0} \\frac{\\sin x}{x}$.',
           answer: '$\\lim_{x\\to0} \\frac{\\sin x}{x} = 1$.' },
@@ -1097,11 +1223,11 @@ mjx-container svg {
           question: 'Definiția primitivei: $F$ este primitivă pentru $f$ pe $D$.',
           answer: '$F$ este derivabilă pe $D$ și $F\'(x)=f(x)$, $\\forall x\\in D$.' },
         { id: 'b98', grade: 'III', tag: 'Analiză',
-          question: 'Teorema: orice funcție continuă admite primitive.',
-          answer: 'Da, orice funcție continuă pe un interval admite primitive.' },
+          question: 'Ce condiție garantează că o funcție admite primitive?',
+          answer: 'Orice funcție continuă pe un interval admite primitive. (O funcție cu discontinuități de speța I nu admite primitive.)' },
         { id: 'b99', grade: 'III', tag: 'Analiză',
-          question: 'Formula Leibniz-Newton: $\\int_a^b f(x) dx = F(b)-F(a)$.',
-          answer: 'Unde $F$ este o primitivă a lui $f$ (adică $F\'=f$).' },
+          question: 'Formula Leibniz-Newton.',
+          answer: '$\\int_a^b f(x)\\, dx = F(b)-F(a) = F(x)\\Big|_a^b$, unde $f$ este continuă pe $[a,b]$ și $F$ este o primitivă a lui $f$ (adică $F\'=f$).' },
         { id: 'b100', grade: 'III', tag: 'Analiză',
           question: 'Integrale nedefinite uzuale: $\\int x^n dx$, $\\int \\frac1x dx$, $\\int e^x dx$, $\\int a^x dx$.',
           answer: '$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$ ($n\\ne-1$); $\\int \\frac1x dx = \\ln|x|+C$; $\\int e^x dx=e^x+C$; $\\int a^x dx = \\frac{a^x}{\\ln a}+C$.' },
@@ -1121,6 +1247,251 @@ mjx-container svg {
           question: 'Volumul corpului de rotație generat de $f$ în jurul axei $Ox$: formula.',
           answer: '$V = \\pi \\int_a^b f^2(x) dx$.' }
     ];
+
+    // ============================================================
+    // ÎNTREBĂRI GRILĂ (4 VARIANTE) — pentru modulul "🎯 Test grilă"
+    //
+    // Fiecare intrare este legată de un card prin `id`, așa că filtrele de
+    // subiect / capitol / căutare se aplică automat și în testul grilă.
+    //
+    // Structura:
+    //   b1: { q: 'Textul întrebării',
+    //         c: 'Varianta CORECTĂ',
+    //         w: ['Greșită 1', 'Greșită 2', 'Greșită 3'] },
+    //
+    // Ordinea variantelor se amestecă la fiecare afișare. După răspuns se
+    // afișează teoria din card. Dacă un card NU are intrare aici, testul
+    // generează automat o întrebare cu variante luate din alte carduri.
+    // ============================================================
+    const mcqData = {
+  // ---------- SUBIECTUL I · ALGEBRĂ ----------
+  b1:  { q: 'Într-o progresie aritmetică, $a_1 = 3$ și $r = 4$. Atunci $a_{10}$ este:',
+         c: '$39$', w: ['$43$', '$36$', '$40$'] },
+  b2:  { q: 'Numerele $x$, $5$, $11$ sunt, în această ordine, termeni consecutivi ai unei progresii aritmetice. Atunci $x$ este:',
+         c: '$-1$', w: ['$1$', '$6$', '$8$'] },
+  b3:  { q: 'Suma primilor 10 termeni ai progresiei aritmetice cu $a_1 = 1$ și $r = 2$ este:',
+         c: '$100$', w: ['$19$', '$110$', '$200$'] },
+  b4:  { q: 'Într-o progresie geometrică, $b_1 = 2$ și $q = 3$. Atunci $b_4$ este:',
+         c: '$54$', w: ['$18$', '$24$', '$162$'] },
+  b5:  { q: 'Numerele pozitive $4$, $x$, $9$ sunt, în această ordine, termeni consecutivi ai unei progresii geometrice. Atunci $x$ este:',
+         c: '$6$', w: ['$6{,}5$', '$13$', '$36$'] },
+  b6:  { q: 'Suma $1 + 2 + 2^2 + \\dots + 2^9$ este egală cu:',
+         c: '$1023$', w: ['$511$', '$1024$', '$2047$'] },
+  b7:  { q: 'Suma $1 + 2 + 3 + \\dots + 20$ este egală cu:',
+         c: '$210$', w: ['$190$', '$200$', '$420$'] },
+  b8:  { q: 'În metoda inducției matematice, după verificarea lui $P(n_0)$, se demonstrează că:',
+         c: '$P(k) \\Rightarrow P(k+1)$, pentru orice $k \\ge n_0$',
+         w: ['$P(k+1) \\Rightarrow P(k)$, pentru orice $k \\ge n_0$', '$P(n_0 + 1)$ este adevărată și atât', '$P(k)$ este adevărată pentru un singur $k > n_0$'] },
+  b9:  { q: '$|2 - \\sqrt{5}|$ este egal cu:',
+         c: '$\\sqrt{5} - 2$', w: ['$2 - \\sqrt{5}$', '$2 + \\sqrt{5}$', '$-2 - \\sqrt{5}$'] },
+  b10: { q: '$\\left(\\frac{2}{3}\\right)^{-2}$ este egal cu:',
+         c: '$\\frac{9}{4}$', w: ['$\\frac{4}{9}$', '$-\\frac{4}{9}$', '$-\\frac{9}{4}$'] },
+  b11: { q: 'Domeniul maxim de definiție al funcției $f(x) = \\sqrt{x - 3}$ este:',
+         c: '$[3, \\infty)$', w: ['$(3, \\infty)$', '$\\mathbb{R}$', '$(-\\infty, 3]$'] },
+  b12: { q: 'Pentru $f:\\mathbb{R}\\to\\mathbb{R}$, $f(x) = 2x - 6$, avem $f(x) < 0$ dacă și numai dacă:',
+         c: '$x \\in (-\\infty, 3)$', w: ['$x \\in (3, \\infty)$', '$x \\in (-\\infty, -3)$', '$x \\in (-3, \\infty)$'] },
+  b13: { q: 'Funcția $f:\\mathbb{R}\\to\\mathbb{R}$, $f(x) = x^3 - x$ este:',
+         c: 'impară', w: ['pară', 'nici pară, nici impară', 'periodică'] },
+  b14: { q: 'O funcție $f$ este inversabilă dacă și numai dacă este:',
+         c: 'bijectivă', w: ['injectivă', 'surjectivă', 'monotonă'] },
+  b15: { q: 'Punctul $A(2, m)$ aparține graficului funcției $f(x) = x^2 - 1$ pentru $m$ egal cu:',
+         c: '$3$', w: ['$1$', '$5$', '$-3$'] },
+  b16: { q: 'Vârful parabolei asociate funcției $f(x) = x^2 - 4x + 3$ este:',
+         c: '$V(2, -1)$', w: ['$V(-2, 15)$', '$V(2, 1)$', '$V(4, 3)$'] },
+  b17: { q: 'Dacă $x_1, x_2$ sunt soluțiile ecuației $x^2 - 5x + 6 = 0$, atunci:',
+         c: '$x_1 + x_2 = 5$ și $x_1 x_2 = 6$', w: ['$x_1 + x_2 = -5$ și $x_1 x_2 = 6$', '$x_1 + x_2 = 6$ și $x_1 x_2 = 5$', '$x_1 + x_2 = 5$ și $x_1 x_2 = -6$'] },
+  b18: { q: 'Pentru $f(x) = x + 1$ și $g(x) = x^2$, funcția $(g \\circ f)(x)$ este:',
+         c: '$(x + 1)^2$', w: ['$x^2 + 1$', '$x^3 + x^2$', '$x^2 + x + 1$'] },
+  b19: { q: 'Mulțimea soluțiilor ecuației $\\sqrt{x + 2} = x$ este:',
+         c: '$\\{2\\}$', w: ['$\\{-1, 2\\}$', '$\\{-1\\}$', '$\\emptyset$'] },
+  b20: { q: 'Soluția ecuației $2^{x+1} = 8$ este:',
+         c: '$x = 2$', w: ['$x = 3$', '$x = 4$', '$x = 7$'] },
+  b21: { q: 'Funcția $f:\\mathbb{R}\\to(0,\\infty)$, $f(x) = \\left(\\frac{1}{3}\\right)^x$ este:',
+         c: 'strict descrescătoare', w: ['strict crescătoare', 'constantă', 'pară'] },
+  b22: { q: '$\\log_2 8 + \\log_2 4$ este egal cu:',
+         c: '$5$', w: ['$\\log_2 12$', '$6$', '$32$'] },
+  b23: { q: '$\\log_4 8$ este egal cu:',
+         c: '$\\frac{3}{2}$', w: ['$\\frac{2}{3}$', '$2$', '$\\frac{1}{2}$'] },
+  b24: { q: 'Care inegalitate este adevărată?',
+         c: '$\\log_{\\frac{1}{2}} 3 < \\log_{\\frac{1}{2}} 2$', w: ['$\\log_2 3 < \\log_2 2$', '$\\log_{\\frac{1}{2}} 3 > \\log_{\\frac{1}{2}} 2$', '$\\log_3 5 < 0$'] },
+  b25: { q: 'Câte permutări are o mulțime cu 5 elemente?',
+         c: '$120$', w: ['$5$', '$25$', '$60$'] },
+  b26: { q: '$A_5^2$ este egal cu:',
+         c: '$20$', w: ['$10$', '$25$', '$60$'] },
+  b27: { q: '$C_6^2$ este egal cu:',
+         c: '$15$', w: ['$12$', '$30$', '$36$'] },
+  b28: { q: 'Se alege la întâmplare un număr natural de două cifre. Probabilitatea ca numărul să fie divizibil cu 10 este:',
+         c: '$\\frac{1}{10}$', w: ['$\\frac{1}{9}$', '$\\frac{9}{100}$', '$\\frac{1}{90}$'] },
+  b29: { q: 'Câte funcții $f: \\{1, 2, 3\\} \\to \\{a, b\\}$ există?',
+         c: '$8$', w: ['$5$', '$6$', '$9$'] },
+  b30: { q: 'Câte funcții injective $f: \\{1, 2\\} \\to \\{1, 2, 3, 4\\}$ există?',
+         c: '$12$', w: ['$6$', '$8$', '$16$'] },
+  b31: { q: 'Câte funcții bijective $f: \\{1, 2, 3, 4\\} \\to \\{1, 2, 3, 4\\}$ există?',
+         c: '$24$', w: ['$4$', '$16$', '$256$'] },
+  b32: { q: 'Câte funcții strict crescătoare $f: \\{1, 2\\} \\to \\{1, 2, 3, 4, 5\\}$ există?',
+         c: '$10$', w: ['$5$', '$20$', '$25$'] },
+  b33: { q: 'Câte funcții strict monotone $f: \\{1, 2\\} \\to \\{1, 2, 3, 4\\}$ există?',
+         c: '$12$', w: ['$6$', '$16$', '$24$'] },
+  b34: { q: 'Câte submulțimi are mulțimea $\\{1, 2, 3, 4, 5\\}$?',
+         c: '$32$', w: ['$10$', '$25$', '$31$'] },
+  b35: { q: 'Câte numere naturale de două cifre distincte există?',
+         c: '$81$', w: ['$72$', '$90$', '$99$'] },
+  b36: { q: 'Câți termeni are dezvoltarea binomului $(a + b)^{10}$?',
+         c: '$11$', w: ['$10$', '$12$', '$20$'] },
+  b37: { q: 'Al treilea termen, $T_3$, al dezvoltării $(x + 2)^5$ (după puterile descrescătoare ale lui $x$) este:',
+         c: '$40x^3$', w: ['$10x^3$', '$20x^3$', '$80x^2$'] },
+
+  // ---------- SUBIECTUL I · GEOMETRIE ANALITICĂ ----------
+  b38: { q: 'Distanța dintre punctele $A(1, 2)$ și $B(4, 6)$ este:',
+         c: '$5$', w: ['$7$', '$25$', '$\\sqrt{7}$'] },
+  b39: { q: 'Mijlocul segmentului $AB$, cu $A(2, -4)$ și $B(6, 8)$, are coordonatele:',
+         c: '$(4, 2)$', w: ['$(8, 4)$', '$(2, 6)$', '$(-2, -6)$'] },
+  b40: { q: 'Panta dreptei $AB$, cu $A(1, 3)$ și $B(3, 7)$, este:',
+         c: '$2$', w: ['$\\frac{1}{2}$', '$4$', '$-2$'] },
+  b41: { q: 'Ecuația dreptei care trece prin $M(1, 2)$ și are panta $3$ este:',
+         c: '$y = 3x - 1$', w: ['$y = 3x + 1$', '$y = 3x + 2$', '$y = x + 3$'] },
+  b42: { q: 'Distanța de la originea $O(0, 0)$ la dreapta $3x + 4y - 10 = 0$ este:',
+         c: '$2$', w: ['$5$', '$10$', '$\\frac{10}{7}$'] },
+  b43: { q: 'Dreptele $y = 2x + 1$ și $y = ax - 3$ sunt paralele pentru $a$ egal cu:',
+         c: '$2$', w: ['$-2$', '$\\frac{1}{2}$', '$-\\frac{1}{2}$'] },
+  b44: { q: 'Dreptele $y = 2x + 1$ și $y = ax - 3$ sunt perpendiculare pentru $a$ egal cu:',
+         c: '$-\\frac{1}{2}$', w: ['$\\frac{1}{2}$', '$2$', '$-2$'] },
+  b45: { q: 'Aria triunghiului cu vârfurile $O(0, 0)$, $A(4, 0)$ și $B(0, 3)$ este:',
+         c: '$6$', w: ['$5$', '$7$', '$12$'] },
+  b53: { q: 'Aria triunghiului $ABC$ cu $AB = 4$, $AC = 6$ și $m(\\hat{A}) = 30^\\circ$ este:',
+         c: '$6$', w: ['$12$', '$24$', '$6\\sqrt{3}$'] },
+  b54: { q: 'Raza cercului circumscris triunghiului cu laturile $6$, $8$ și $10$ este:',
+         c: '$5$', w: ['$2$', '$4$', '$10$'] },
+
+  // ---------- SUBIECTUL I · TRIGONOMETRIE ----------
+  b46: { q: 'Dacă $x \\in \\left(0, \\frac{\\pi}{2}\\right)$ și $\\sin x = \\frac{3}{5}$, atunci $\\cos x$ este:',
+         c: '$\\frac{4}{5}$', w: ['$-\\frac{4}{5}$', '$\\frac{2}{5}$', '$\\frac{3}{4}$'] },
+  b47: { q: '$\\sin 60^\\circ$ este egal cu:',
+         c: '$\\frac{\\sqrt{3}}{2}$', w: ['$\\frac{1}{2}$', '$\\frac{\\sqrt{2}}{2}$', '$\\sqrt{3}$'] },
+  b48: { q: '$\\sin 75^\\circ$ este egal cu:',
+         c: '$\\frac{\\sqrt{6} + \\sqrt{2}}{4}$', w: ['$\\frac{\\sqrt{6} - \\sqrt{2}}{4}$', '$\\frac{\\sqrt{3} + 1}{2}$', '$\\frac{\\sqrt{2} + \\sqrt{3}}{2}$'] },
+  b49: { q: 'Dacă $\\sin a = \\frac{1}{3}$, atunci $\\cos 2a$ este:',
+         c: '$\\frac{7}{9}$', w: ['$\\frac{8}{9}$', '$\\frac{2}{3}$', '$-\\frac{7}{9}$'] },
+  b50: { q: 'Soluțiile ecuației $\\cos x = \\frac{1}{2}$ sunt ($k \\in \\mathbb{Z}$):',
+         c: '$x = \\pm\\frac{\\pi}{3} + 2k\\pi$', w: ['$x = (-1)^k\\frac{\\pi}{3} + k\\pi$', '$x = \\pm\\frac{\\pi}{6} + 2k\\pi$', '$x = \\frac{\\pi}{3} + k\\pi$'] },
+  b51: { q: 'În triunghiul $ABC$, $AC = 3$, $AB = 5$ și $m(\\hat{A}) = 60^\\circ$. Atunci $BC$ este:',
+         c: '$\\sqrt{19}$', w: ['$7$', '$4$', '$\\sqrt{34}$'] },
+  b52: { q: 'În triunghiul $ABC$, $BC = 6$ și $m(\\hat{A}) = 30^\\circ$. Raza cercului circumscris este:',
+         c: '$6$', w: ['$3$', '$12$', '$6\\sqrt{3}$'] },
+
+  // ---------- SUBIECTUL I · NUMERE COMPLEXE ----------
+  b55: { q: 'Partea imaginară a numărului complex $z = 3 - 4i$ este:',
+         c: '$-4$', w: ['$4$', '$-4i$', '$3$'] },
+  b56: { q: 'Modulul numărului complex $z = 3 - 4i$ este:',
+         c: '$5$', w: ['$1$', '$7$', '$25$'] },
+  b57: { q: 'Dacă $|z_1| = 2$ și $|z_2| = 3$, atunci $|z_1 \\cdot z_2|$ este:',
+         c: '$6$', w: ['$5$', '$13$', '$\\sqrt{13}$'] },
+  b58: { q: 'Dacă $z = \\cos\\frac{\\pi}{6} + i\\sin\\frac{\\pi}{6}$, atunci $z^6$ este:',
+         c: '$-1$', w: ['$1$', '$i$', '$-i$'] },
+
+  // ---------- SUBIECTUL I · VECTORI ----------
+  b59: { q: 'Pentru $A(1, 2)$ și $B(4, -1)$, vectorul $\\overrightarrow{AB}$ este:',
+         c: '$3\\vec{i} - 3\\vec{j}$', w: ['$-3\\vec{i} + 3\\vec{j}$', '$5\\vec{i} + \\vec{j}$', '$3\\vec{i} + 3\\vec{j}$'] },
+  b60: { q: 'Pentru $A(-1, 2)$ și $B(5, 10)$, lungimea vectorului $\\overrightarrow{AB}$ este:',
+         c: '$10$', w: ['$14$', '$100$', '$\\sqrt{14}$'] },
+  b61: { q: 'Pentru $\\vec{u} = 2\\vec{i} + 3\\vec{j}$ și $\\vec{v} = 4\\vec{i} - \\vec{j}$, produsul scalar $\\vec{u} \\cdot \\vec{v}$ este:',
+         c: '$5$', w: ['$-5$', '$7$', '$11$'] },
+  b62: { q: 'Vectorii $\\vec{u} = 2\\vec{i} + 3\\vec{j}$ și $\\vec{v} = a\\vec{i} + 6\\vec{j}$ sunt coliniari pentru $a$ egal cu:',
+         c: '$4$', w: ['$-9$', '$1$', '$3$'] },
+
+  // ---------- SUBIECTUL al II-lea · ALGEBRĂ SUPERIOARĂ ----------
+  b63: { q: '$\\begin{vmatrix} 2 & 3 \\\\ 1 & 4 \\end{vmatrix}$ este egal cu:',
+         c: '$5$', w: ['$-5$', '$8$', '$11$'] },
+  b64: { q: '$\\begin{vmatrix} 1 & 0 & 2 \\\\ 0 & 1 & 0 \\\\ 3 & 0 & 1 \\end{vmatrix}$ este egal cu:',
+         c: '$-5$', w: ['$1$', '$5$', '$7$'] },
+  b65: { q: 'Dacă $A \\in \\mathcal{M}_2(\\mathbb{R})$ și $\\det(A) = 3$, atunci $\\det(A^2)$ este:',
+         c: '$9$', w: ['$3$', '$6$', '$27$'] },
+  b66: { q: 'Inversa matricei $A = \\begin{pmatrix} 2 & 1 \\\\ 5 & 3 \\end{pmatrix}$ este:',
+         c: '$\\begin{pmatrix} 3 & -1 \\\\ -5 & 2 \\end{pmatrix}$',
+         w: ['$\\begin{pmatrix} 3 & -5 \\\\ -1 & 2 \\end{pmatrix}$', '$\\begin{pmatrix} -3 & 1 \\\\ 5 & -2 \\end{pmatrix}$', '$\\begin{pmatrix} \\frac{1}{2} & 1 \\\\ \\frac{1}{5} & \\frac{1}{3} \\end{pmatrix}$'] },
+  b67: { q: 'Conform teoremei Kronecker–Capelli, un sistem liniar este compatibil dacă și numai dacă:',
+         c: 'rang$(A)$ = rang$(\\overline{A})$', w: ['$\\det(A) \\neq 0$', 'rang$(A)$ < rang$(\\overline{A})$', 'are tot atâtea ecuații câte necunoscute'] },
+  b68: { q: 'Pentru sistemul $\\begin{cases} x + y = 3 \\\\ 2x - y = 0 \\end{cases}$ avem $\\Delta = -3$ și $\\Delta_x = -3$. Atunci $x$ este:',
+         c: '$1$', w: ['$-1$', '$2$', '$9$'] },
+  b69: { q: 'Soluția ecuației matriceale $X \\cdot A = B$, cu $A$ inversabilă, este:',
+         c: '$X = B \\cdot A^{-1}$', w: ['$X = A^{-1} \\cdot B$', '$X = B \\cdot A$', '$X = A \\cdot B^{-1}$'] },
+  b70: { q: 'Care dintre mulțimile următoare este parte stabilă a lui $\\mathbb{Z}$ în raport cu adunarea?',
+         c: '$2\\mathbb{Z}$ (numerele pare)', w: ['mulțimea numerelor impare', '$\\{-1, 0, 1\\}$', '$\\mathbb{Z} \\setminus \\{0\\}$'] },
+  b71: { q: 'Elementul neutru al legii $x * y = x + y - 3$ pe $\\mathbb{R}$ este:',
+         c: '$e = 3$', w: ['$e = 0$', '$e = -3$', '$e = 1$'] },
+  b72: { q: 'Care proprietate NU face parte din definiția grupului $(G, *)$?',
+         c: 'comutativitatea', w: ['asociativitatea', 'existența elementului neutru', 'orice element este simetrizabil'] },
+  b73: { q: 'Structura $(\\mathbb{N}, +)$ este:',
+         c: 'monoid, dar nu grup', w: ['grup', 'grup abelian', 'nici măcar monoid'] },
+  b74: { q: 'Care dintre următoarele este inel (cu adunarea și înmulțirea uzuale)?',
+         c: '$(\\mathbb{Z}, +, \\cdot)$', w: ['$(\\mathbb{N}, +, \\cdot)$', '(numerele impare, $+$, $\\cdot$)', '$(\\{-1, 1\\}, +, \\cdot)$'] },
+  b75: { q: 'Dacă $f: (G_1, *) \\to (G_2, \\circ)$ este morfism de grupuri, atunci $f(e_1)$ este:',
+         c: '$e_2$, elementul neutru din $G_2$', w: ['$e_1$', 'orice element din $G_2$', 'nu se poate determina'] },
+  b76: { q: 'Restul împărțirii polinomului $P(X) = X^3 - 2X + 5$ la $X - 2$ este:',
+         c: '$9$', w: ['$0$', '$1$', '$5$'] },
+  b77: { q: 'Rădăcinile întregi ale ecuației $x^3 - 2x^2 - x + 2 = 0$ se caută printre elementele mulțimii:',
+         c: '$\\{\\pm 1, \\pm 2\\}$', w: ['$\\{1, 2\\}$', '$\\{\\pm 1, \\pm 2, \\pm 3\\}$', '$\\{0, \\pm 1\\}$'] },
+  b78: { q: 'O ecuație cu coeficienți întregi are coeficientul dominant $2$ și termenul liber $3$. Rădăcinile ei raționale $\\frac{p}{q}$ (ireductibile) verifică:',
+         c: '$p$ divide $3$ și $q$ divide $2$', w: ['$p$ divide $2$ și $q$ divide $3$', '$p$ divide $6$ și $q = 1$', '$p$ și $q$ divid $5$'] },
+  b79: { q: 'Pentru ecuația $x^3 - 6x^2 + 11x - 6 = 0$, produsul $x_1 x_2 x_3$ este:',
+         c: '$6$', w: ['$-6$', '$11$', '$-11$'] },
+  b80: { q: 'Pentru ecuația $x^4 - 3x^3 + 2x - 5 = 0$, suma $x_1 + x_2 + x_3 + x_4$ este:',
+         c: '$3$', w: ['$-3$', '$2$', '$-5$'] },
+
+  // ---------- SUBIECTUL al III-lea · ANALIZĂ ----------
+  b81: { q: 'Derivata funcției $f$ în punctul $x_0$ se definește prin:',
+         c: '$f\'(x_0) = \\lim_{x \\to x_0} \\frac{f(x) - f(x_0)}{x - x_0}$',
+         w: ['$f\'(x_0) = \\lim_{x \\to x_0} [f(x) - f(x_0)]$', '$f\'(x_0) = \\frac{f(x_0)}{x_0}$', '$f\'(x_0) = \\lim_{x \\to x_0} \\frac{f(x)}{x}$'] },
+  b82: { q: 'Teorema lui Fermat: dacă $x_0$ este punct de extrem local, interior intervalului, iar $f$ este derivabilă în $x_0$, atunci:',
+         c: '$f\'(x_0) = 0$', w: ['$f(x_0) = 0$', '$f\'\'(x_0) = 0$', '$f\'(x_0) > 0$'] },
+  b83: { q: 'Teorema lui Lagrange afirmă existența unui $c \\in (a, b)$ astfel încât:',
+         c: '$f\'(c) = \\frac{f(b) - f(a)}{b - a}$', w: ['$f\'(c) = 0$', '$f(c) = \\frac{f(a) + f(b)}{2}$', '$f\'(c) = f(b) - f(a)$'] },
+  b84: { q: 'Pentru a aplica teorema lui Rolle pe $[a, b]$, pe lângă continuitate și derivabilitate, mai este necesar ca:',
+         c: '$f(a) = f(b)$', w: ['$f(a) = 0$', '$f\'(a) = f\'(b)$', '$f$ să fie monotonă'] },
+  b85: { q: 'Derivata funcției $f(x) = x \\cdot e^x$ este:',
+         c: '$(x + 1)e^x$', w: ['$e^x$', '$x e^{x-1}$', '$1 + e^x$'] },
+  b86: { q: 'Funcția $f:\\mathbb{R}\\to\\mathbb{R}$, $f(x) = x^3 + x$ este bijectivă și $f(1) = 2$. Atunci $(f^{-1})\'(2)$ este:',
+         c: '$\\frac{1}{4}$', w: ['$4$', '$\\frac{1}{13}$', '$\\frac{1}{2}$'] },
+  b87: { q: 'Derivata funcției $f:(0,\\infty)\\to\\mathbb{R}$, $f(x) = \\ln x + x^2$ este:',
+         c: '$\\frac{1}{x} + 2x$', w: ['$\\frac{1}{x} + x$', '$\\ln x + 2x$', '$e^x + 2x$'] },
+  b88: { q: 'Derivata funcției $f(x) = \\sin x + \\cos x$ este:',
+         c: '$\\cos x - \\sin x$', w: ['$\\cos x + \\sin x$', '$-\\cos x - \\sin x$', '$\\sin x - \\cos x$'] },
+  b89: { q: 'Ecuația tangentei la graficul funcției $f(x) = x^2$ în punctul de abscisă $x_0 = 1$ este:',
+         c: '$y = 2x - 1$', w: ['$y = 2x + 1$', '$y = 2x$', '$y = x$'] },
+  b90: { q: 'Asimptota orizontală spre $+\\infty$ a graficului funcției $f(x) = \\frac{2x + 1}{x - 3}$ are ecuația:',
+         c: '$y = 2$', w: ['$x = 3$', '$y = 0$', '$y = -\\frac{1}{3}$'] },
+  b91: { q: 'Asimptota verticală a graficului funcției $f(x) = \\frac{2x + 1}{x - 3}$ are ecuația:',
+         c: '$x = 3$', w: ['$y = 2$', '$x = -3$', '$x = -\\frac{1}{2}$'] },
+  b92: { q: 'Asimptota oblică spre $+\\infty$ a graficului funcției $f(x) = \\frac{x^2 + 1}{x}$ are ecuația:',
+         c: '$y = x$', w: ['$y = x + 1$', '$y = 1$', '$x = 0$'] },
+  b93: { q: '$\\lim_{x \\to 0} \\frac{\\sin 3x}{x}$ este egală cu:',
+         c: '$3$', w: ['$0$', '$1$', '$\\frac{1}{3}$'] },
+  b94: { q: '$\\lim_{x \\to 0} \\frac{e^{2x} - 1}{x}$ este egală cu:',
+         c: '$2$', w: ['$1$', '$\\frac{1}{2}$', '$\\infty$'] },
+  b95: { q: '$\\lim_{x \\to \\infty} \\left(1 + \\frac{2}{x}\\right)^x$ este egală cu:',
+         c: '$e^2$', w: ['$1$', '$e$', '$\\infty$'] },
+  b96: { q: 'Folosind regula lui l\'Hospital, $\\lim_{x \\to \\infty} \\frac{\\ln x}{x}$ este egală cu:',
+         c: '$0$', w: ['$1$', '$e$', '$\\infty$'] },
+  b97: { q: '$F(x) = x^3 + 5$ este o primitivă a funcției:',
+         c: '$f(x) = 3x^2$', w: ['$f(x) = 3x^2 + 5$', '$f(x) = \\frac{x^4}{4} + 5x$', '$f(x) = x^3$'] },
+  b98: { q: 'Care afirmație este adevărată?',
+         c: 'Orice funcție continuă pe un interval admite primitive',
+         w: ['Orice funcție care admite primitive este continuă', 'O funcție cu discontinuitate de speța I admite primitive', 'Orice funcție definită pe un interval admite primitive'] },
+  b99: { q: '$\\int_0^2 3x^2 \\, dx$ este egală cu:',
+         c: '$8$', w: ['$4$', '$6$', '$12$'] },
+  b100: { q: '$\\int 2^x \\, dx$ este egală cu:',
+         c: '$\\frac{2^x}{\\ln 2} + C$', w: ['$2^x \\ln 2 + C$', '$\\frac{2^{x+1}}{x+1} + C$', '$x \\cdot 2^{x-1} + C$'] },
+  b101: { q: '$\\int \\sin x \\, dx$ este egală cu:',
+         c: '$-\\cos x + C$', w: ['$\\cos x + C$', '$-\\sin x + C$', '$\\frac{\\sin^2 x}{2} + C$'] },
+  b102: { q: 'Integrând prin părți, $\\int x e^x \\, dx$ este egală cu:',
+         c: '$(x - 1)e^x + C$', w: ['$(x + 1)e^x + C$', '$x e^x + C$', '$\\frac{x^2}{2} e^x + C$'] },
+  b103: { q: 'Cu schimbarea de variabilă $t = x^2$, $\\int 2x \\cos(x^2) \\, dx$ este egală cu:',
+         c: '$\\sin(x^2) + C$', w: ['$-\\sin(x^2) + C$', '$x^2 \\sin(x^2) + C$', '$\\cos(x^2) + C$'] },
+  b104: { q: 'Aria suprafeței delimitate de graficul funcției $f(x) = x^2$, axa $Ox$ și dreptele $x = 0$, $x = 3$ este:',
+         c: '$9$', w: ['$3$', '$6$', '$27$'] },
+  b105: { q: 'Volumul corpului obținut prin rotirea în jurul axei $Ox$ a graficului funcției $f(x) = x$, $x \\in [0, 3]$, este:',
+         c: '$9\\pi$', w: ['$3\\pi$', '$\\frac{9\\pi}{2}$', '$27\\pi$'] }
+    };
 
     // ============================================================
     // LOGICA APLICAȚIEI (IDEM CU CELELALTE VERSIUNI)
@@ -1387,7 +1758,18 @@ mjx-container svg {
     fullscreenBtn.addEventListener('click',toggleFocusMode);
     focusExitBtn.addEventListener('click',exitFocusMode);
 
+    // Scurtăturile de tastatură NU se aplică atunci când utilizatorul scrie într-un
+    // câmp (ex. căutarea) sau când e deschis un test / o sesiune de repetiție.
+    function shortcutsBlocked(e){
+        const t=e.target;
+        if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable)) return true;
+        return ['quizOverlay','srsOverlay'].some(id=>{ const el=document.getElementById(id); return el&&el.style.display!=='none'; });
+    }
+
     document.addEventListener('keydown',(e)=>{
+        // cât timp testul grilă e deschis, tastele îl controlează doar pe el
+        if(typeof isMcqOpen==='function'&&isMcqOpen()){ handleMcqKey(e); return; }
+        if(shortcutsBlocked(e)) return;
         if(e.key==='ArrowRight'){e.preventDefault();nextCard();}
         else if(e.key==='ArrowLeft'){e.preventDefault();prevCard();}
         else if(e.key===' '||e.key==='Enter'){e.preventDefault();toggleAnswer();}
@@ -1510,6 +1892,308 @@ mjx-container svg {
     quizRetryMissedBtn.addEventListener('click',function(){ startQuiz(shuffleArray(quizMissed)); });
     quizOverlay.addEventListener('click',function(e){ if(e.target===quizOverlay) closeQuiz(); });
 
+    // ============ TEST GRILĂ (4 VARIANTE) ============
+    const MCQ_HISTORY_KEY = 'anki_matematica_bac_mcq_history_v1';
+    const MCQ_LETTERS = ['A', 'B', 'C', 'D'];
+
+    const mcqOverlay = document.getElementById('mcqOverlay');
+    const mcqSetup = document.getElementById('mcqSetup');
+    const mcqPlay = document.getElementById('mcqPlay');
+    const mcqResults = document.getElementById('mcqResults');
+    const mcqStartBtn = document.getElementById('mcqStartBtn');
+    const mcqCancelBtn = document.getElementById('mcqCancelBtn');
+    const mcqBeginBtn = document.getElementById('mcqBeginBtn');
+    const mcqCountOptions = document.getElementById('mcqCountOptions');
+    const mcqSetupInfo = document.getElementById('mcqSetupInfo');
+    const mcqBestScore = document.getElementById('mcqBestScore');
+    const mcqProgressText = document.getElementById('mcqProgressText');
+    const mcqScoreText = document.getElementById('mcqScoreText');
+    const mcqProgressFill = document.getElementById('mcqProgressFill');
+    const mcqTag = document.getElementById('mcqTag');
+    const mcqGrade = document.getElementById('mcqGrade');
+    const mcqQuestion = document.getElementById('mcqQuestion');
+    const mcqOptions = document.getElementById('mcqOptions');
+    const mcqFeedback = document.getElementById('mcqFeedback');
+    const mcqExplain = document.getElementById('mcqExplain');
+    const mcqNextBtn = document.getElementById('mcqNextBtn');
+    const mcqExitBtn = document.getElementById('mcqExitBtn');
+    const mcqResultScore = document.getElementById('mcqResultScore');
+    const mcqResultPercent = document.getElementById('mcqResultPercent');
+    const mcqResultGrade = document.getElementById('mcqResultGrade');
+    const mcqResultBest = document.getElementById('mcqResultBest');
+    const mcqMissedWrap = document.getElementById('mcqMissedWrap');
+    const mcqMissedList = document.getElementById('mcqMissedList');
+    const mcqRetryMissedBtn = document.getElementById('mcqRetryMissedBtn');
+    const mcqRestartBtn = document.getElementById('mcqRestartBtn');
+    const mcqCloseBtn = document.getElementById('mcqCloseBtn');
+
+    let mcqPool = [];        // întrebările testului curent: { card, q, options[4], correctIdx }
+    let mcqIndex = 0;
+    let mcqScore = 0;
+    let mcqAnswered = false;
+    let mcqMissed = [];      // { item, chosenIdx }
+
+    function isMcqOpen() {
+        return mcqOverlay.style.display !== 'none';
+    }
+
+    function loadMcqHistory() {
+        try {
+            const raw = localStorage.getItem(MCQ_HISTORY_KEY);
+            if (raw) return JSON.parse(raw);
+        } catch (e) {}
+        return {};
+    }
+
+    function saveMcqBest(scopeKey, percent) {
+        try {
+            const hist = loadMcqHistory();
+            if (hist[scopeKey] === undefined || percent > hist[scopeKey]) {
+                hist[scopeKey] = percent;
+                localStorage.setItem(MCQ_HISTORY_KEY, JSON.stringify(hist));
+            }
+        } catch (e) {}
+    }
+
+    // Construiește o întrebare grilă pentru un card: folosește întrebarea scrisă
+    // în `mcqData` sau, dacă lipsește, una generată din răspunsurile altor carduri.
+    function buildMcqItem(card) {
+        const def = mcqData[card.id];
+        let q, correct, wrong;
+        if (def && def.c && Array.isArray(def.w) && def.w.length >= 3) {
+            q = def.q || card.question;
+            correct = def.c;
+            wrong = def.w.slice(0, 3);
+        } else {
+            q = card.question + ' <br><span style="font-size:0.8rem; font-weight:500; opacity:0.75;">Alege răspunsul corect:</span>';
+            correct = card.answer;
+            let others = cardsData.filter(c => c.id !== card.id && c.tag === card.tag && c.answer !== card.answer);
+            if (others.length < 3) others = cardsData.filter(c => c.id !== card.id && c.answer !== card.answer);
+            wrong = shuffleArray(others).slice(0, 3).map(c => c.answer);
+        }
+        const options = shuffleArray([correct].concat(wrong));
+        return { card: card, q: q, options: options, correctIdx: options.indexOf(correct) };
+    }
+
+    function mcqAvailablePool() {
+        return filteredCards.length > 0 ? filteredCards : cardsData;
+    }
+
+    function openMcqSetup() {
+        const pool = mcqAvailablePool();
+        const total = pool.length;
+        mcqSetupInfo.textContent = 'Întrebări disponibile pentru filtrul activ: ' + total + '.';
+
+        const best = loadMcqHistory()[currentQuizScopeKey()];
+        if (best !== undefined) {
+            mcqBestScore.style.display = 'block';
+            mcqBestScore.innerHTML = '🏆 Recordul tău la grilă pentru acest filtru: <b>' + best + '%</b>';
+        } else {
+            mcqBestScore.style.display = 'none';
+        }
+
+        const options = [5, 10, 20, total].filter((n, idx, self) => n > 0 && n <= total && self.indexOf(n) === idx);
+        mcqCountOptions.innerHTML = '';
+        let selectedCount = options.length ? options[Math.min(1, options.length - 1)] : total;
+        options.forEach(function(n) {
+            const btn = document.createElement('button');
+            btn.className = 'quiz-count-btn' + (n === selectedCount ? ' active' : '');
+            btn.textContent = (n === total) ? ('Toate (' + total + ')') : String(n);
+            btn.addEventListener('click', function() {
+                Array.from(mcqCountOptions.children).forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                selectedCount = n;
+            });
+            mcqCountOptions.appendChild(btn);
+        });
+        mcqBeginBtn.onclick = function() {
+            if (total === 0) return;
+            startMcq(shuffleArray(pool).slice(0, selectedCount).map(buildMcqItem));
+        };
+
+        mcqSetup.style.display = 'block';
+        mcqPlay.style.display = 'none';
+        mcqResults.style.display = 'none';
+        mcqOverlay.style.display = 'flex';
+    }
+
+    function startMcq(items) {
+        mcqPool = items;
+        mcqIndex = 0;
+        mcqScore = 0;
+        mcqMissed = [];
+        mcqSetup.style.display = 'none';
+        mcqResults.style.display = 'none';
+        mcqPlay.style.display = 'block';
+        renderMcqQuestion();
+    }
+
+    function renderMcqQuestion() {
+        mcqAnswered = false;
+        const item = mcqPool[mcqIndex];
+        const card = item.card;
+        mcqProgressText.textContent = 'Întrebarea ' + (mcqIndex + 1) + '/' + mcqPool.length;
+        mcqScoreText.textContent = '✓ ' + mcqScore;
+        mcqProgressFill.style.width = (mcqIndex / mcqPool.length * 100) + '%';
+        mcqTag.textContent = card.tag || 'General';
+        mcqGrade.textContent = formatGrades(card.grade);
+        mcqQuestion.innerHTML = item.q;
+
+        mcqOptions.innerHTML = '';
+        item.options.forEach(function(opt, i) {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mcq-option';
+            btn.dataset.idx = i;
+            btn.innerHTML = '<span class="mcq-letter">' + MCQ_LETTERS[i] + '</span>' +
+                            '<span class="mcq-text">' + opt + '</span>' +
+                            '<span class="mcq-mark"></span>';
+            btn.addEventListener('click', function() { chooseMcqOption(i); });
+            mcqOptions.appendChild(btn);
+        });
+
+        mcqFeedback.textContent = '';
+        mcqFeedback.className = 'mcq-feedback';
+        mcqExplain.innerHTML = '';
+        mcqExplain.classList.add('hidden');
+        mcqNextBtn.style.display = 'none';
+        renderLatex(mcqQuestion);
+        renderLatex(mcqOptions);
+    }
+
+    function chooseMcqOption(idx) {
+        if (mcqAnswered) return;
+        mcqAnswered = true;
+        const item = mcqPool[mcqIndex];
+        const isRight = idx === item.correctIdx;
+        const buttons = Array.from(mcqOptions.children);
+        buttons.forEach(function(btn, i) {
+            btn.disabled = true;
+            const mark = btn.querySelector('.mcq-mark');
+            if (i === item.correctIdx) {
+                btn.classList.add('correct');
+                mark.textContent = '✓';
+            } else if (i === idx) {
+                btn.classList.add('wrong');
+                mark.textContent = '✗';
+            } else {
+                btn.classList.add('dimmed');
+            }
+        });
+
+        if (isRight) {
+            mcqScore++;
+            mcqFeedback.textContent = '✓ Corect!';
+            mcqFeedback.className = 'mcq-feedback ok';
+        } else {
+            mcqMissed.push({ item: item, chosenIdx: idx });
+            mcqFeedback.textContent = '✗ Greșit — răspunsul corect este varianta ' + MCQ_LETTERS[item.correctIdx] + '.';
+            mcqFeedback.className = 'mcq-feedback ko';
+        }
+        mcqScoreText.textContent = '✓ ' + mcqScore;
+
+        // Explicația = răspunsul din cardul de teorie
+        mcqExplain.innerHTML = '<div class="mcq-explain-label">📖 Teorie</div>' + item.card.answer;
+        mcqExplain.classList.remove('hidden');
+        renderLatex(mcqExplain);
+
+        mcqNextBtn.textContent = (mcqIndex + 1 < mcqPool.length) ? 'Următoarea întrebare ▶' : 'Vezi rezultatul 🏁';
+        mcqNextBtn.style.display = 'inline-block';
+        mcqNextBtn.focus({ preventScroll: true });
+    }
+
+    function nextMcqQuestion() {
+        if (!mcqAnswered) return;
+        if (mcqIndex + 1 < mcqPool.length) {
+            mcqIndex++;
+            renderMcqQuestion();
+            mcqOverlay.querySelector('.quiz-box').scrollTop = 0;
+        } else {
+            finishMcq();
+        }
+    }
+
+    function finishMcq() {
+        mcqPlay.style.display = 'none';
+        mcqResults.style.display = 'block';
+        const total = mcqPool.length;
+        const percent = total > 0 ? Math.round((mcqScore / total) * 100) : 0;
+        mcqResultScore.textContent = mcqScore + '/' + total;
+        mcqResultPercent.textContent = percent + '% răspunsuri corecte';
+        mcqResultGrade.textContent =
+            percent >= 90 ? '🌟 Excelent!' :
+            percent >= 70 ? '👍 Foarte bine!' :
+            percent >= 50 ? '💪 Bine, mai exersează puțin.' :
+                            '📚 Recapitulează teoria și încearcă din nou.';
+
+        const scopeKey = currentQuizScopeKey();
+        const prevBest = loadMcqHistory()[scopeKey];
+        saveMcqBest(scopeKey, percent);
+        if (prevBest === undefined) {
+            mcqResultBest.style.display = 'block';
+            mcqResultBest.textContent = '🏆 Primul tău record la grilă pentru acest filtru: ' + percent + '%';
+        } else if (percent > prevBest) {
+            mcqResultBest.style.display = 'block';
+            mcqResultBest.textContent = '🎉 Record nou! (anterior: ' + prevBest + '%)';
+        } else {
+            mcqResultBest.style.display = 'none';
+        }
+
+        if (mcqMissed.length > 0) {
+            mcqMissedWrap.style.display = 'block';
+            mcqMissedList.innerHTML = '';
+            mcqMissed.forEach(function(m) {
+                const div = document.createElement('div');
+                div.className = 'quiz-missed-item';
+                div.innerHTML = m.item.q +
+                    '<span class="mcq-missed-answer">✓ ' + m.item.options[m.item.correctIdx] + '</span>';
+                mcqMissedList.appendChild(div);
+            });
+            renderLatex(mcqMissedList);
+            mcqRetryMissedBtn.style.display = 'inline-block';
+        } else {
+            mcqMissedWrap.style.display = 'none';
+            mcqRetryMissedBtn.style.display = 'none';
+        }
+    }
+
+    function closeMcq() {
+        mcqOverlay.style.display = 'none';
+    }
+
+    mcqStartBtn.addEventListener('click', openMcqSetup);
+    mcqCancelBtn.addEventListener('click', closeMcq);
+    mcqCloseBtn.addEventListener('click', closeMcq);
+    mcqExitBtn.addEventListener('click', closeMcq);
+    mcqNextBtn.addEventListener('click', nextMcqQuestion);
+    mcqRestartBtn.addEventListener('click', openMcqSetup);
+    mcqRetryMissedBtn.addEventListener('click', function() {
+        // reia aceleași întrebări greșite, cu variantele amestecate din nou
+        startMcq(shuffleArray(mcqMissed.map(m => buildMcqItem(m.item.card))));
+    });
+    mcqOverlay.addEventListener('click', function(e) {
+        if (e.target === mcqOverlay) closeMcq();
+    });
+
+    // Tastatură în testul grilă: 1–4 sau A–D aleg varianta, Enter = următoarea, Esc = închide
+    function handleMcqKey(e) {
+        if (mcqPlay.style.display === 'none') {
+            if (e.key === 'Escape') closeMcq();
+            return;
+        }
+        const k = e.key.toLowerCase();
+        const map = { '1': 0, '2': 1, '3': 2, '4': 3, 'a': 0, 'b': 1, 'c': 2, 'd': 3 };
+        if (!mcqAnswered && map.hasOwnProperty(k)) {
+            e.preventDefault();
+            chooseMcqOption(map[k]);
+        } else if (mcqAnswered && (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight')) {
+            e.preventDefault();
+            nextMcqQuestion();
+        } else if (e.key === 'Escape') {
+            closeMcq();
+        }
+    }
+
     // ============ SRS ============
     const srsOverlay=document.getElementById('srsOverlay');
     const srsSetup=document.getElementById('srsSetup');
@@ -1617,7 +2301,7 @@ mjx-container svg {
     // ============ INIȚIALIZARE ============
     try { const savedTheme=localStorage.getItem(THEME_KEY); if(savedTheme==='dark') applyTheme(true); else if(!savedTheme&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme(true); } catch(e) {}
     renderCard(); updateStats();
-    window.addEventListener('load', ()=>{ if(window.MathJax) window.MathJax.typesetPromise().catch(()=>{}); });
+    window.addEventListener('load', ()=>{ if(window.MathJax&&window.MathJax.typesetPromise) window.MathJax.typesetPromise().catch(()=>{}); });
     const observer = new MutationObserver(()=>{ if(!cardAnswer.classList.contains('hidden')) renderLatex(cardAnswer); });
     observer.observe(cardAnswer, { attributes: true, attributeFilter: ['class'] });
 </script>
