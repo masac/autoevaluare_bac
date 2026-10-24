@@ -697,6 +697,14 @@ mjx-container svg {
             <option value="Algebră superioară">Algebră superioară</option>
             <option value="Analiză">Analiză</option>
         </select>
+        <label for="profileFilter">Profil:</label>
+        <select id="profileFilter" title="Profilul de bacalaureat (conform programei 2027)">
+            <option value="all">Toate (M1–M4)</option>
+            <option value="M1">M1 · mate-info</option>
+            <option value="M2">M2 · șt. naturii</option>
+            <option value="M3">M3 · tehnologic</option>
+            <option value="M4">M4 · pedagogic</option>
+        </select>
         <input type="text" id="searchInput" placeholder="🔍 Caută în întrebări și răspunsuri..." />
         <button id="shuffleBtn" class="pill-btn">🔀 Amestecă</button>
         <button id="unlearnedBtn" class="pill-btn">📌 Doar neînvățate</button>
@@ -749,7 +757,7 @@ mjx-container svg {
         <!-- Ecran 1: Setare test -->
         <div id="quizSetup">
             <h2 style="margin:0 0 6px 0; font-size:1.15rem;">📝 Autoevaluare</h2>
-            <p id="quizSetupInfo" style="margin:0 0 16px 0; font-size:0.8rem; color:#5c7089;">Testul folosește filtrele active.</p>
+            <p id="quizSetupInfo" style="margin:0 0 16px 0; font-size:0.8rem; color:#5c7089;">Testul folosește filtrele active (subiect / capitol / profil / căutare).</p>
             <div id="quizBestScore" style="font-size:0.75rem; margin-bottom:14px; display:none;"></div>
             <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:8px;">Câte întrebări?</label>
             <div id="quizCountOptions" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"></div>
@@ -812,7 +820,7 @@ mjx-container svg {
         <div id="mcqSetup">
             <h2 style="margin:0 0 6px 0; font-size:1.15rem;">🎯 Test grilă</h2>
             <p id="mcqSetupInfo" style="margin:0 0 6px 0; font-size:0.8rem; color:#5c7089;"></p>
-            <p style="margin:0 0 16px 0; font-size:0.72rem; color:#8098b3;">Fiecare întrebare are 4 variante de răspuns, dintre care una singură este corectă. Testul folosește filtrele active (subiect / capitol / căutare).</p>
+            <p style="margin:0 0 16px 0; font-size:0.72rem; color:#8098b3;">Fiecare întrebare are 4 variante de răspuns, dintre care una singură este corectă. Testul folosește filtrele active (subiect / capitol / profil / căutare).</p>
             <div id="mcqBestScore" style="font-size:0.75rem; margin-bottom:14px; display:none;"></div>
             <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:8px;">Câte întrebări?</label>
             <div id="mcqCountOptions" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;"></div>
@@ -924,7 +932,13 @@ mjx-container svg {
 <script>
     // ============================================================
     // DATELE CARDURILOR - EXTRASE DIN SINTEZA BAC 2027 (CLASELE IX-XII)
-    // Toate întrebările și răspunsurile sunt preluate din PDF-ul atașat.
+    // Toate întrebările și răspunsurile sunt preluate din sinteza actualizată.
+    //
+    // Câmpul opțional `prof` arată profilurile în a căror programă intră noțiunea:
+    //   prof: ['M1', 'M2', 'M3']   -> apare la M1, M2 și M3
+    //   fără `prof`                -> apare la toate profilurile (M1–M4)
+    //   prof: []                   -> în afara programei 2027 (apare doar la „Toate”)
+    // M1 = mate-info, M2 = științe ale naturii, M3 = tehnologic, M4 = pedagogic.
     // ============================================================
     const baseCardsData = [
         // --- SUBIECTUL I: Algebră și Geometrie (Clasele IX-X) ---
@@ -945,11 +959,11 @@ mjx-container svg {
           answer: '$b^2 = a \\cdot c \\iff b = \\sqrt{a \\cdot c}$.' },
         { id: 'b6', grade: 'I', tag: 'Algebră',
           question: 'Suma primilor $n$ termeni ai unei progresii geometrice ($q \\neq 1$).',
-          answer: '$S_n = b_1 \\cdot \\dfrac{q^n - 1}{q - 1}$.' },
-        { id: 'b7', grade: 'I', tag: 'Algebră',
+          answer: '$S_n = b_1 \\cdot \\dfrac{q^n - 1}{q - 1}$. Dacă $q = 1$: $S_n = n \\cdot b_1$.' },
+        { id: 'b7', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
           question: 'Sume remarcabile: $\\sum_{k=1}^{n} k$; $\\sum_{k=1}^{n} k^2$; $\\sum_{k=1}^{n} k^3$.',
           answer: '$\\sum k = \\frac{n(n+1)}{2}$; $\\sum k^2 = \\frac{n(n+1)(2n+1)}{6}$; $\\sum k^3 = \\left[\\frac{n(n+1)}{2}\\right]^2$.' },
-        { id: 'b8', grade: 'I', tag: 'Algebră',
+        { id: 'b8', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
           question: 'Principiul inducției matematice: enunț.',
           answer: '1) $P(n_0)$ adevărată. 2) Dacă $P(k)$ adevărată $\\Rightarrow P(k+1)$ adevărată. Atunci $P(n)$ adevărată $\\forall n \\ge n_0$.' },
         { id: 'b9', grade: 'I', tag: 'Algebră',
@@ -963,7 +977,7 @@ mjx-container svg {
           answer: 'Ordin par: $f(x) \\ge 0$. Ordin impar: nu există restricții ($f(x) \\in \\mathbb{R}$).' },
         { id: 'b12', grade: 'I', tag: 'Algebră',
           question: 'Semnul funcției de gradul I: $f(x)=ax+b$, $a>0$.',
-          answer: '$f(x)<0$ pentru $x<-\\frac{b}{a}$; $f(x)=0$ pentru $x=-\\frac{b}{a}$; $f(x)>0$ pentru $x>-\\frac{b}{a}$.' },
+          answer: '$f(x)<0$ pentru $x<-\\frac{b}{a}$; $f(x)=0$ pentru $x=-\\frac{b}{a}$; $f(x)>0$ pentru $x>-\\frac{b}{a}$. Dacă $a < 0$, semnele se inversează: $f(x) > 0$ pentru $x < -\\frac{b}{a}$ și $f(x) < 0$ pentru $x > -\\frac{b}{a}$.' },
         { id: 'b13', grade: 'I', tag: 'Algebră',
           question: 'Definiții: funcție pară, impară, periodică.',
           answer: 'Pară: $f(-x)=f(x)$. Impară: $f(-x)=-f(x)$. Periodică de perioadă $K \\neq 0$: $f(x+K)=f(x)$, $\\forall x$.' },
@@ -979,7 +993,7 @@ mjx-container svg {
         { id: 'b17', grade: 'I', tag: 'Algebră',
           question: 'Relațiile lui Viète pentru $ax^2+bx+c=0$: $S$, $P$.',
           answer: '$S = x_1+x_2 = -\\frac{b}{a}$; $P = x_1\\cdot x_2 = \\frac{c}{a}$.' },
-        { id: 'b18', grade: 'I', tag: 'Algebră',
+        { id: 'b18', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
           question: 'Compunerea funcțiilor: $(g\\circ f)(x)$ și inversa compunerii.',
           answer: '$(g\\circ f)(x)=g(f(x))$. Dacă $f,g$ inversabile, atunci $(g\\circ f)^{-1} = f^{-1}\\circ g^{-1}$.' },
         { id: 'b19', grade: 'I', tag: 'Algebră',
@@ -996,7 +1010,7 @@ mjx-container svg {
           answer: 'Pentru $a>0$, $a\\neq1$, $x,y>0$: $\\log_a x + \\log_a y = \\log_a(xy)$; $\\log_a x - \\log_a y = \\log_a\\frac{x}{y}$; $\\log_a x^k = k\\log_a x$.' },
         { id: 'b23', grade: 'I', tag: 'Algebră',
           question: 'Formula de schimbare a bazei pentru logaritmi.',
-          answer: '$\\log_a b = \\frac{\\log_c b}{\\log_c a} = \\frac{1}{\\log_b a}$.' },
+          answer: '$\\log_a b = \\frac{\\log_c b}{\\log_c a} = \\frac{1}{\\log_b a}$. Condiții: $a, c > 0$, $a, c \\neq 1$, $b > 0$ (iar pentru a doua formulă $b \\neq 1$).' },
         { id: 'b24', grade: 'I', tag: 'Algebră',
           question: 'Monotonia funcției logaritmice $f(x)=\\log_a x$ ($a>0, a\\neq1$).',
           answer: 'Dacă $a\\in(0,1)$: strict descrescătoare. Dacă $a\\in(1,\\infty)$: strict crescătoare.' },
@@ -1009,34 +1023,34 @@ mjx-container svg {
         { id: 'b27', grade: 'I', tag: 'Algebră',
           question: 'Combinări: $C_n^k$.',
           answer: '$C_n^k = \\frac{n!}{k!(n-k)!}$ (nu contează ordinea elementelor).' },
-        { id: 'b28', grade: 'I', tag: 'Algebră',
+        { id: 'b28', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
           question: 'Formula probabilității: $P(A)$.',
           answer: '$P(A) = \\dfrac{\\text{număr cazuri favorabile}}{\\text{număr cazuri posibile}}$.' },
-        { id: 'b29', grade: 'I', tag: 'Algebră',
+        { id: 'b29', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Numărul de funcții $f:M\\to N$ cu $|M|=m, |N|=n$.',
           answer: '$n^m$.' },
-        { id: 'b30', grade: 'I', tag: 'Algebră',
+        { id: 'b30', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Numărul de funcții injective $f:M\\to N$ ($m\\le n$).',
           answer: '$A_n^m = \\frac{n!}{(n-m)!}$.' },
-        { id: 'b31', grade: 'I', tag: 'Algebră',
+        { id: 'b31', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Numărul de funcții bijective $f:M\\to N$ ($m=n$).',
           answer: '$P_n = n!$.' },
-        { id: 'b32', grade: 'I', tag: 'Algebră',
+        { id: 'b32', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Numărul de funcții strict crescătoare $f:M\\to N$ ($m\\le n$).',
-          answer: '$C_n^m = \\frac{n!}{m!(n-m)!}$.' },
-        { id: 'b33', grade: 'I', tag: 'Algebră',
+          answer: '$C_n^m = \\frac{n!}{m!(n-m)!}$. Numărul funcțiilor strict descrescătoare este tot $C_n^m$.' },
+        { id: 'b33', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Numărul de funcții strict monotone $f:M\\to N$ ($2\\le m\\le n$).',
           answer: '$2\\cdot C_n^m$.' },
-        { id: 'b34', grade: 'I', tag: 'Algebră',
+        { id: 'b34', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
           question: 'Numărul de submulțimi ale unei mulțimi cu $n$ elemente.',
           answer: '$2^n$ (inclusiv mulțimea vidă și ea însăși).' },
-        { id: 'b35', grade: 'I', tag: 'Algebră',
+        { id: 'b35', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
           question: 'Regula produsului și numărul de numere de 2 cifre, 3 cifre, 2 cifre distincte.',
-          answer: '2 cifre: $9\\cdot10=90$; 3 cifre: $9\\cdot10\\cdot10=900$; 2 cifre distincte: $9\\cdot9=81$.' },
-        { id: 'b36', grade: 'I', tag: 'Algebră',
+          answer: '2 cifre: $9\\cdot10=90$; 3 cifre: $9\\cdot10\\cdot10=900$; 2 cifre distincte: $9\\cdot9=81$. 3 cifre distincte: $9 \\cdot 9 \\cdot 8 = 648$.' },
+        { id: 'b36', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Binomul lui Newton: formula generală.',
           answer: '$(a+b)^n = \\sum_{k=0}^{n} C_n^k a^{n-k} b^k$.' },
-        { id: 'b37', grade: 'I', tag: 'Algebră',
+        { id: 'b37', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2'],
           question: 'Termenul general $T_{k+1}$ al dezvoltării binomului.',
           answer: '$T_{k+1} = C_n^k a^{n-k} b^k$, $k=0,1,\\dots,n$.' },
         { id: 'b38', grade: 'I', tag: 'Geometrie plană',
@@ -1063,19 +1077,19 @@ mjx-container svg {
         { id: 'b45', grade: 'I', tag: 'Geometrie plană',
           question: 'Aria triunghiului cu determinant (coordonate).',
           answer: '$\\mathcal{A} = \\frac{1}{2}|\\Delta|$, unde $\\Delta = \\begin{vmatrix} x_A & y_A & 1 \\\\ x_B & y_B & 1 \\\\ x_C & y_C & 1 \\end{vmatrix}$. Dacă $\\Delta=0$, punctele sunt coliniare.' },
-        { id: 'b46', grade: 'I', tag: 'Trigonometrie',
+        { id: 'b46', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2', 'M3'],
           question: 'Formule fundamentale: $\\sin^2 x + \\cos^2 x$; $\\tan x$; $\\cot x$; $\\tan x\\cdot\\cot x$.',
           answer: '$\\sin^2 x + \\cos^2 x = 1$; $\\tan x = \\frac{\\sin x}{\\cos x}$; $\\cot x = \\frac{\\cos x}{\\sin x}$; $\\tan x\\cdot\\cot x = 1$.' },
         { id: 'b47', grade: 'I', tag: 'Trigonometrie',
           question: 'Valori remarcabile: $\\sin 30^\\circ, \\sin 45^\\circ, \\sin 60^\\circ$; $\\cos 30^\\circ, \\cos 45^\\circ, \\cos 60^\\circ$.',
           answer: '$\\sin 30^\\circ=\\frac12,\\ \\sin 45^\\circ=\\frac{\\sqrt2}{2},\\ \\sin 60^\\circ=\\frac{\\sqrt3}{2}$; $\\cos 30^\\circ=\\frac{\\sqrt3}{2},\\ \\cos 45^\\circ=\\frac{\\sqrt2}{2},\\ \\cos 60^\\circ=\\frac12$.' },
-        { id: 'b48', grade: 'I', tag: 'Trigonometrie',
+        { id: 'b48', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2', 'M3'],
           question: 'Formule: $\\sin(a+b)$, $\\sin(a-b)$, $\\cos(a+b)$, $\\cos(a-b)$.',
           answer: '$\\sin(a\\pm b)=\\sin a\\cos b \\pm \\cos a\\sin b$; $\\cos(a\\pm b)=\\cos a\\cos b \\mp \\sin a\\sin b$.' },
-        { id: 'b49', grade: 'I', tag: 'Trigonometrie',
+        { id: 'b49', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2', 'M3'],
           question: 'Formule: $\\sin 2a$, $\\cos 2a$.',
           answer: '$\\sin 2a = 2\\sin a\\cos a$; $\\cos 2a = \\cos^2 a - \\sin^2 a = 2\\cos^2 a -1 = 1-2\\sin^2 a$.' },
-        { id: 'b50', grade: 'I', tag: 'Trigonometrie',
+        { id: 'b50', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2'],
           question: 'Ecuații trigonometrice fundamentale: $\\sin x = a$, $\\cos x = a$ ($|a|\\le1$).',
           answer: '$\\sin x = a \\Rightarrow x = (-1)^k\\arcsin a + k\\pi$; $\\cos x = a \\Rightarrow x = \\pm\\arccos a + 2k\\pi$, cu $k \\in \\mathbb{Z}$.' },
         { id: 'b51', grade: 'I', tag: 'Trigonometrie',
@@ -1090,25 +1104,25 @@ mjx-container svg {
         { id: 'b54', grade: 'I', tag: 'Geometrie plană',
           question: 'Raza cercului circumscris $R$ și înscris $r$ în triunghi.',
           answer: '$R = \\frac{abc}{4A}$; $r = \\frac{A}{p}$ ($p$ semiperimetru).' },
-        { id: 'b55', grade: 'I', tag: 'Numere complexe',
+        { id: 'b55', grade: 'I', tag: 'Numere complexe', prof: ['M1', 'M2', 'M3'],
           question: 'Forma unui număr complex: $z=a+bi$, $i^2=-1$. Partea reală și imaginară.',
           answer: '$\\operatorname{Re}(z)=a$, $\\operatorname{Im}(z)=b$.' },
-        { id: 'b56', grade: 'I', tag: 'Numere complexe',
+        { id: 'b56', grade: 'I', tag: 'Numere complexe', prof: ['M1', 'M2', 'M3'],
           question: 'Conjugatul și modulul unui număr complex $z=a+bi$.',
           answer: '$\\bar{z}=a-bi$; $|z|=\\sqrt{a^2+b^2}$.' },
-        { id: 'b57', grade: 'I', tag: 'Numere complexe',
+        { id: 'b57', grade: 'I', tag: 'Numere complexe', prof: ['M1', 'M2', 'M3'],
           question: 'Proprietăți ale modulului: $|z|$, $|\\bar{z}|$, $|z_1\\cdot z_2|$, $|z_1+z_2|$.',
-          answer: '$|z|\\ge0$, $|z|=|\\bar{z}|$, $|z_1\\cdot z_2|=|z_1|\\cdot|z_2|$, $|z_1+z_2|\\le |z_1|+|z_2|$.' },
-        { id: 'b58', grade: 'I', tag: 'Numere complexe',
+          answer: '$|z|\\ge0$, $|z|=|\\bar{z}|$, $|z_1\\cdot z_2|=|z_1|\\cdot|z_2|$, $|z_1+z_2|\\le |z_1|+|z_2|$. De asemenea, $z \\cdot \\bar{z} = |z|^2$.' },
+        { id: 'b58', grade: 'I', tag: 'Numere complexe', prof: [],
           question: 'Forma trigonometrică a unui număr complex și formula lui Moivre.',
-          answer: '$z = r(\\cos\\theta + i\\sin\\theta)$; $z^n = r^n(\\cos n\\theta + i\\sin n\\theta)$.' },
+          answer: '$z = r(\\cos\\theta + i\\sin\\theta)$; $z^n = r^n(\\cos n\\theta + i\\sin n\\theta)$. Atenție: forma trigonometrică și formula lui Moivre NU apar în programa de bacalaureat 2027 (la niciun profil).' },
         { id: 'b59', grade: 'I', tag: 'Vectori',
           question: 'Vectorul $\\overrightarrow{AB}$ pentru $A(x_A,y_A), B(x_B,y_B)$.',
           answer: '$\\overrightarrow{AB} = (x_B-x_A)\\vec{i} + (y_B-y_A)\\vec{j}$.' },
         { id: 'b60', grade: 'I', tag: 'Vectori',
           question: 'Modulul vectorului $\\overrightarrow{AB}$.',
           answer: '$\\|\\overrightarrow{AB}\\| = \\sqrt{(x_B-x_A)^2+(y_B-y_A)^2}$.' },
-        { id: 'b61', grade: 'I', tag: 'Vectori',
+        { id: 'b61', grade: 'I', tag: 'Vectori', prof: ['M1', 'M2'],
           question: 'Produsul scalar: $\\vec{a}\\cdot\\vec{b}$ și formula cu coordonate.',
           answer: '$\\vec{a}\\cdot\\vec{b} = |\\vec{a}|\\cdot|\\vec{b}|\\cdot\\cos\\angle(\\vec{a},\\vec{b}) = x_1x_2+y_1y_2$.' },
         { id: 'b62', grade: 'I', tag: 'Vectori',
@@ -1124,11 +1138,11 @@ mjx-container svg {
           answer: '$\\begin{vmatrix} a_{11} & a_{12} & a_{13} \\\\ a_{21} & a_{22} & a_{23} \\\\ a_{31} & a_{32} & a_{33} \\end{vmatrix} = a_{11}a_{22}a_{33} + a_{21}a_{32}a_{13} + a_{12}a_{23}a_{31} - a_{13}a_{22}a_{31} - a_{12}a_{21}a_{33} - a_{11}a_{23}a_{32}$.' },
         { id: 'b65', grade: 'II', tag: 'Algebră superioară',
           question: 'Proprietăți ale determinanților: det$(A^t)$, det$(A\\cdot B)$, det$(A^n)$.',
-          answer: 'det$(A^t)=$det$(A)$; det$(A\\cdot B)=$det$(A)\\cdot$det$(B)$; det$(A^n)=($det$A)^n$.' },
+          answer: 'det$(A^t)=$det$(A)$; det$(A\\cdot B)=$det$(A)\\cdot$det$(B)$; det$(A^n)=($det$A)^n$. $\\det(\\alpha A) = \\alpha^n \\det A$ pentru $A \\in \\mathcal{M}_n$.' },
         { id: 'b66', grade: 'II', tag: 'Algebră superioară',
           question: 'Formula inversei unei matrice $A$: $A^{-1}$.',
           answer: '$A^{-1} = \\frac{1}{\\det(A)} \\cdot A^*$, unde $A^*$ este adjuncta (transpusa complementelor algebrice).' },
-        { id: 'b67', grade: 'II', tag: 'Algebră superioară',
+        { id: 'b67', grade: 'II', tag: 'Algebră superioară', prof: ['M1'],
           question: 'Teorema lui Kronecker-Capelli: compatibilitatea sistemelor.',
           answer: 'Sistemul este compatibil $\\iff$ rang$(A)$ = rang$\\overline{A}$.' },
         { id: 'b68', grade: 'II', tag: 'Algebră superioară',
@@ -1152,100 +1166,256 @@ mjx-container svg {
         { id: 'b74', grade: 'II', tag: 'Algebră superioară',
           question: 'Definiția inelului: $(A,+,\\cdot)$.',
           answer: '1) $(A,+)$ grup abelian; 2) $(A,\\cdot)$ monoid; 3) înmulțirea distributivă față de adunare.' },
-        { id: 'b75', grade: 'II', tag: 'Algebră superioară',
+        { id: 'b75', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
           question: 'Morfism de grupuri: $f:G_1\\to G_2$; proprietăți.',
           answer: '$f(x*y)=f(x)\\circ f(y)$; $f(e_1)=e_2$; $f(x\')=(f(x))\'$. Dacă $f$ bijectivă $\\Rightarrow$ izomorfism.' },
-        { id: 'b76', grade: 'II', tag: 'Algebră superioară',
-          question: 'Teorema restului (Bézout): restul împărțirii lui $P(X)$ la $(X-a)$.',
+        { id: 'b76', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
+          question: 'Teorema restului: restul împărțirii lui $P(X)$ la $(X-a)$.',
           answer: '$R = P(a)$.' },
-        { id: 'b77', grade: 'II', tag: 'Algebră superioară',
+        { id: 'b77', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
           question: 'Rădăcinile întregi ale unei ecuații algebrice cu coeficienți în $\\mathbb{Z}$.',
           answer: 'Se află printre divizorii termenului liber (se verifică fiecare divizor; nu toți sunt neapărat rădăcini).' },
-        { id: 'b78', grade: 'II', tag: 'Algebră superioară',
+        { id: 'b78', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
           question: 'Rădăcinile raționale ale unei ecuații algebrice cu coeficienți în $\\mathbb{Z}$: forma $\\frac{p}{q}$.',
           answer: 'Dacă $\\frac{p}{q}$ (ireductibilă) este rădăcină, atunci $p$ divide termenul liber și $q$ divide coeficientul dominant.' },
-        { id: 'b79', grade: 'II', tag: 'Algebră superioară',
+        { id: 'b79', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
           question: 'Relațiile lui Viète pentru $ax^3+bx^2+cx+d=0$: sumă, sumă produse 2 câte 2, produs.',
           answer: '$x_1+x_2+x_3 = -\\frac{b}{a}$; $x_1x_2+x_1x_3+x_2x_3 = \\frac{c}{a}$; $x_1x_2x_3 = -\\frac{d}{a}$.' },
-        { id: 'b80', grade: 'II', tag: 'Algebră superioară',
+        { id: 'b80', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2'],
           question: 'Relațiile lui Viète pentru $ax^4+bx^3+cx^2+dx+e=0$: formulele.',
           answer: '$ \\sum x_i = -\\frac{b}{a} $; $ \\sum x_i x_j = \\frac{c}{a} $; $ \\sum x_i x_j x_k = -\\frac{d}{a} $; $ x_1x_2x_3x_4 = \\frac{e}{a} $.' },
         // --- SUBIECTUL al III-lea: Analiză Matematică (Clasele XI-XII) ---
-        { id: 'b81', grade: 'III', tag: 'Analiză',
+        { id: 'b81', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Formula derivatei într-un punct $x_0$: $f\'(x_0)$.',
-          answer: '$f\'(x_0) = \\lim_{x\\to x_0} \\frac{f(x)-f(x_0)}{x-x_0}$.' },
-        { id: 'b82', grade: 'III', tag: 'Analiză',
+          answer: '$f\'(x_0) = \\lim_{x\\to x_0} \\frac{f(x)-f(x_0)}{x-x_0}$. Dacă această limită există și este finită, $f$ este derivabilă în $x_0$.' },
+        { id: 'b82', grade: 'III', tag: 'Analiză', prof: ['M1'],
           question: 'Teorema lui Fermat: condiția pentru punct de extrem local.',
           answer: 'Dacă $f:I\\to\\mathbb{R}$ este derivabilă în $x_0$ și $x_0$ este punct de extrem local situat în interiorul intervalului $I$, atunci $f\'(x_0)=0$.' },
-        { id: 'b83', grade: 'III', tag: 'Analiză',
+        { id: 'b83', grade: 'III', tag: 'Analiză', prof: ['M1'],
           question: 'Teorema lui Lagrange (a creșterilor finite).',
           answer: 'Fie $f:[a,b]\\to\\mathbb{R}$ continuă, derivabilă pe $(a,b)$. Atunci $\\exists c\\in(a,b)$ a.î. $f\'(c)=\\frac{f(b)-f(a)}{b-a}$.' },
-        { id: 'b84', grade: 'III', tag: 'Analiză',
+        { id: 'b84', grade: 'III', tag: 'Analiză', prof: ['M1'],
           question: 'Teorema lui Rolle.',
           answer: 'Fie $f:[a,b]\\to\\mathbb{R}$ continuă, derivabilă pe $(a,b)$ și $f(a)=f(b)$. Atunci $\\exists c\\in(a,b)$ a.î. $f\'(c)=0$.' },
-        { id: 'b85', grade: 'III', tag: 'Analiză',
+        { id: 'b85', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Reguli de derivare: $(f+g)\'$, $(c\\cdot f)\'$, $(f\\cdot g)\'$, $(f/g)\'$, $[f(g(x))]\'$.',
           answer: '$(f+g)\'=f\'+g\'$; $(c f)\'=c f\'$; $(fg)\'=f\'g+fg\'$; $(\\frac{f}{g})\'=\\frac{f\'g-fg\'}{g^2}$; $[f(g(x))]\'=f\'(g(x))g\'(x)$.' },
-        { id: 'b86', grade: 'III', tag: 'Analiză',
+        { id: 'b86', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Derivata funcției inverse: $(f^{-1})\'(y_0)$.',
           answer: '$(f^{-1})\'(y_0) = \\frac{1}{f\'(x_0)}$, unde $y_0=f(x_0)$ și $f\'(x_0)\\neq0$ ($f$ bijectivă, continuă, derivabilă în $x_0$).' },
-        { id: 'b87', grade: 'III', tag: 'Analiză',
+        { id: 'b87', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Derivate uzuale: $(c)\'$, $(x^n)\'$, $(e^x)\'$, $(a^x)\'$, $(\\ln x)\'$, $(\\log_a x)\'$.',
           answer: '$(c)\'=0$; $(x^n)\'=nx^{n-1}$; $(e^x)\'=e^x$; $(a^x)\'=a^x\\ln a$; $(\\ln x)\'=\\frac1x$; $(\\log_a x)\'=\\frac{1}{x\\ln a}$.' },
-        { id: 'b88', grade: 'III', tag: 'Analiză',
+        { id: 'b88', grade: 'III', tag: 'Analiză', prof: ['M1'],
           question: 'Derivate uzuale: $(\\sin x)\'$, $(\\cos x)\'$, $(\\tan x)\'$, $(\\arcsin x)\'$, $(\\arctan x)\'$.',
           answer: '$(\\sin x)\'=\\cos x$; $(\\cos x)\'=-\\sin x$; $(\\tan x)\'=\\frac{1}{\\cos^2 x}=1+\\tan^2 x$; $(\\arcsin x)\'=\\frac{1}{\\sqrt{1-x^2}}$; $(\\arctan x)\'=\\frac{1}{1+x^2}$.' },
-        { id: 'b89', grade: 'III', tag: 'Analiză',
+        { id: 'b89', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Ecuația tangentei la graficul lui $f$ în $x_0$:',
           answer: '$y - f(x_0)=f\'(x_0)(x-x_0)$.' },
-        { id: 'b90', grade: 'III', tag: 'Analiză',
+        { id: 'b90', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Asimptotă orizontală: definiție.',
           answer: '$y=L$ este asimptotă orizontală dacă $\\lim_{x\\to\\pm\\infty} f(x) = L \\in \\mathbb{R}$.' },
-        { id: 'b91', grade: 'III', tag: 'Analiză',
+        { id: 'b91', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Asimptotă verticală: definiție.',
           answer: '$x=a$ este asimptotă verticală dacă cel puțin una dintre limitele laterale $\\lim_{x\\to a^-} f(x)$, $\\lim_{x\\to a^+} f(x)$ este $+\\infty$ sau $-\\infty$.' },
-        { id: 'b92', grade: 'III', tag: 'Analiză',
+        { id: 'b92', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Asimptotă oblică: $y=mx+n$. Cum se calculează $m$ și $n$?',
-          answer: '$m = \\lim_{x\\to\\infty} \\frac{f(x)}{x}$; $n = \\lim_{x\\to\\infty} [f(x) - mx]$. Asimptota oblică există dacă $m \\in \\mathbb{R}^*$ și $n \\in \\mathbb{R}$ (analog spre $-\\infty$).' },
-        { id: 'b93', grade: 'III', tag: 'Analiză',
+          answer: '$m = \\lim_{x\\to\\infty} \\frac{f(x)}{x}$; $n = \\lim_{x\\to\\infty} [f(x) - mx]$. Asimptota oblică există dacă $m \\in \\mathbb{R}^*$ și $n \\in \\mathbb{R}$ (analog spre $-\\infty$). Dacă $f$ are asimptotă orizontală spre $+\\infty$, nu are asimptotă oblică spre $+\\infty$.' },
+        { id: 'b93', grade: 'III', tag: 'Analiză', prof: ['M1'],
           question: 'Limita fundamentală: $\\lim_{x\\to0} \\frac{\\sin x}{x}$.',
           answer: '$\\lim_{x\\to0} \\frac{\\sin x}{x} = 1$.' },
-        { id: 'b94', grade: 'III', tag: 'Analiză',
+        { id: 'b94', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Limita fundamentală: $\\lim_{x\\to0} \\frac{e^x-1}{x}$.',
           answer: '$\\lim_{x\\to0} \\frac{e^x-1}{x} = 1$.' },
-        { id: 'b95', grade: 'III', tag: 'Analiză',
+        { id: 'b95', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Limita fundamentală: $\\lim_{x\\to\\infty} \\left(1+\\frac{1}{x}\\right)^x$ și $\\lim_{x\\to\\infty} \\left(1+\\frac{a}{x}\\right)^x$.',
-          answer: '$\\lim_{x\\to\\infty} \\left(1+\\frac{1}{x}\\right)^x = e$; $\\lim_{x\\to\\infty} \\left(1+\\frac{a}{x}\\right)^x = e^a$.' },
-        { id: 'b96', grade: 'III', tag: 'Analiză',
+          answer: '$\\lim_{x\\to\\infty} \\left(1+\\frac{1}{x}\\right)^x = e$; $\\lim_{x\\to\\infty} \\left(1+\\frac{a}{x}\\right)^x = e^a$. Mai general (cazul $1^\\infty$): dacă $u(x) \\to 0$, atunci $\\lim (1 + u(x))^{\\frac{1}{u(x)}} = e$.' },
+        { id: 'b96', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Regula lui L\'Hospital: cazul $\\frac{0}{0}$ sau $\\frac{\\infty}{\\infty}$.',
-          answer: '$\\lim_{x\\to a} \\frac{f(x)}{g(x)} = \\lim_{x\\to a} \\frac{f\'(x)}{g\'(x)}$ (dacă limitele există).' },
-        { id: 'b97', grade: 'III', tag: 'Analiză',
+          answer: '$\\lim_{x\\to a} \\frac{f(x)}{g(x)} = \\lim_{x\\to a} \\frac{f\'(x)}{g\'(x)}$ (dacă limitele există). Ex: $\\lim_{x \\to 0} \\frac{e^x - 1}{x} = \\lim_{x \\to 0} \\frac{e^x}{1} = 1$.' },
+        { id: 'b97', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Definiția primitivei: $F$ este primitivă pentru $f$ pe $D$.',
-          answer: '$F$ este derivabilă pe $D$ și $F\'(x)=f(x)$, $\\forall x\\in D$.' },
-        { id: 'b98', grade: 'III', tag: 'Analiză',
+          answer: '$F$ este derivabilă pe $D$ și $F\'(x)=f(x)$, $\\forall x\\in D$. Primitivele se scriu $\\int f(x)\\,dx = F(x) + C$. Pentru a arăta că $F$ este primitivă a lui $f$ se verifică $F\' = f$ (definiția).' },
+        { id: 'b98', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Ce condiție garantează că o funcție admite primitive?',
           answer: 'Orice funcție continuă pe un interval admite primitive. (O funcție cu discontinuități de speța I nu admite primitive.)' },
-        { id: 'b99', grade: 'III', tag: 'Analiză',
+        { id: 'b99', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Formula Leibniz-Newton.',
           answer: '$\\int_a^b f(x)\\, dx = F(b)-F(a) = F(x)\\Big|_a^b$, unde $f$ este continuă pe $[a,b]$ și $F$ este o primitivă a lui $f$ (adică $F\'=f$).' },
-        { id: 'b100', grade: 'III', tag: 'Analiză',
+        { id: 'b100', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Integrale nedefinite uzuale: $\\int x^n dx$, $\\int \\frac1x dx$, $\\int e^x dx$, $\\int a^x dx$.',
           answer: '$\\int x^n dx = \\frac{x^{n+1}}{n+1}+C$ ($n\\ne-1$); $\\int \\frac1x dx = \\ln|x|+C$; $\\int e^x dx=e^x+C$; $\\int a^x dx = \\frac{a^x}{\\ln a}+C$.' },
-        { id: 'b101', grade: 'III', tag: 'Analiză',
+        { id: 'b101', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Integrale nedefinite uzuale: $\\int \\sin x dx$, $\\int \\cos x dx$, $\\int \\frac{1}{\\cos^2 x}dx$, $\\int \\frac{1}{\\sin^2 x}dx$.',
           answer: '$\\int \\sin x dx = -\\cos x+C$; $\\int \\cos x dx = \\sin x+C$; $\\int \\frac{1}{\\cos^2 x}dx = \\tan x+C$; $\\int \\frac{1}{\\sin^2 x}dx = -\\cot x+C$.' },
-        { id: 'b102', grade: 'III', tag: 'Analiză',
+        { id: 'b102', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Integrarea prin părți: formula.',
           answer: '$\\int f(x)g\'(x)dx = f(x)g(x) - \\int f\'(x)g(x)dx$.' },
-        { id: 'b103', grade: 'III', tag: 'Analiză',
+        { id: 'b103', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Schimbarea de variabilă: formula.',
           answer: '$\\int f(g(x))g\'(x)dx = \\int f(t)dt$, cu $t=g(x)$.' },
-        { id: 'b104', grade: 'III', tag: 'Analiză',
+        { id: 'b104', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Aria suprafeței plane delimitate de graficul lui $f$ și axa $Ox$: formula.',
           answer: '$A = \\int_a^b |f(x)| dx$.' },
-        { id: 'b105', grade: 'III', tag: 'Analiză',
+        { id: 'b105', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
           question: 'Volumul corpului de rotație generat de $f$ în jurul axei $Ox$: formula.',
-          answer: '$V = \\pi \\int_a^b f^2(x) dx$.' }
+          answer: '$V = \\pi \\int_a^b f^2(x) dx$.' },
+
+  // ============ SUBIECTUL I - COMPLETĂRI DIN SINTEZA ACTUALIZATĂ ============
+  { id: 'b106', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Formule de calcul prescurtat: $(a \\pm b)^3$.',
+    answer: '$(a \\pm b)^3 = a^3 \\pm 3a^2b + 3ab^2 \\pm b^3$.' },
+  { id: 'b107', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Descompunerea sumei și diferenței de cuburi: $a^3 - b^3$, $a^3 + b^3$.',
+    answer: '$a^3 - b^3 = (a - b)(a^2 + ab + b^2)$; $a^3 + b^3 = (a + b)(a^2 - ab + b^2)$.' },
+  { id: 'b108', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Proprietăți ale modulului unui număr real.',
+    answer: '$|t| \\ge 0$; $|t| = 0 \\iff t = 0$; $|t| = |-t|$; $|a \\cdot b| = |a| \\cdot |b|$; $\\left|\\frac{a}{b}\\right| = \\frac{|a|}{|b|}$ ($b \\neq 0$); $\\sqrt{t^2} = |t|$; $|a + b| \\le |a| + |b|$; $|a| + |b| = 0 \\iff a = b = 0$. Pentru $a > 0$: $|x| \\le a \\iff -a \\le x \\le a$; $|x| \\ge a \\iff x \\le -a$ sau $x \\ge a$.' },
+  { id: 'b109', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Trecerea de la radical la putere: $\\sqrt[n]{x^m}$.',
+    answer: '$\\sqrt[n]{x^m} = x^{\\frac{m}{n}}$, $x > 0$, $m \\in \\mathbb{Z}$, $n \\in \\mathbb{N}$, $n \\ge 2$. Ex: $\\sqrt{x} = x^{\\frac{1}{2}}$, $\\sqrt[3]{x^2} = x^{\\frac{2}{3}}$, $\\frac{1}{\\sqrt[4]{x^3}} = x^{-\\frac{3}{4}}$. (La M3 și M4: doar radicali de ordin 2 și 3.)' },
+  { id: 'b110', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Funcții injective, surjective, bijective: criterii utile.',
+    answer: 'O funcție strict monotonă este injectivă. Dacă $\\operatorname{Im} f = B$ (imaginea este egală cu codomeniul), atunci $f : A \\to B$ este surjectivă. $f$ este bijectivă $\\iff$ este injectivă și surjectivă.' },
+  { id: 'b111', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Intersecția graficului unei funcții cu axele de coordonate.',
+    answer: 'Cu axa $Ox$: se rezolvă ecuația $f(x) = 0$. Cu axa $Oy$: se calculează $f(0)$ (dacă $0 \\in D$); punctul este $(0, f(0))$.' },
+  { id: 'b112', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Semnul funcției de gradul al II-lea.',
+    answer: '$\\Delta < 0$: $f(x)$ are semnul lui $a$ pentru orice $x \\in \\mathbb{R}$. $\\Delta = 0$: semnul lui $a$ pentru $x \\neq x_1$, iar $f(x_1) = 0$. $\\Delta > 0$ ($x_1 < x_2$): semnul lui $a$ pentru $x \\in (-\\infty, x_1) \\cup (x_2, \\infty)$ și semn contrar lui $a$ pentru $x \\in (x_1, x_2)$.' },
+  { id: 'b113', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Valoarea minimă/maximă a funcției de gradul II și axa de simetrie a parabolei.',
+    answer: 'Dacă $a > 0$ (ramuri în sus), valoarea minimă este $-\\frac{\\Delta}{4a}$; dacă $a < 0$ (ramuri în jos), valoarea maximă este $-\\frac{\\Delta}{4a}$; extremul se atinge în $x = -\\frac{b}{2a}$. Axa de simetrie a parabolei: dreapta $x = -\\frac{b}{2a}$.' },
+  { id: 'b114', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Formule derivate din relațiile lui Viète: $x_1^2 + x_2^2$ și $\\frac{1}{x_1} + \\frac{1}{x_2}$.',
+    answer: '$x_1^2 + x_2^2 = S^2 - 2P$; $\\frac{1}{x_1} + \\frac{1}{x_2} = \\frac{S}{P}$ ($P \\neq 0$), unde $S = -\\frac{b}{a}$, $P = \\frac{c}{a}$.' },
+  { id: 'b115', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Ecuații exponențiale de forma $m \\cdot a^{2x} + n \\cdot a^x + p = 0$.',
+    answer: 'Se folosește substituția $a^x = t$, cu condiția obligatorie $t > 0$; se rezolvă ecuația de gradul II în $t$, se păstrează doar soluțiile pozitive și se revine la $a^x = t$.' },
+  { id: 'b116', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Ecuații logaritmice: condiții de existență și proprietățile $\\log_a a$, $\\log_a 1$, $a^{\\log_a x}$.',
+    answer: 'Pentru $\\log_a f(x) = b$: C.E. $f(x) > 0$, $a > 0$, $a \\neq 1$; atunci $f(x) = a^b$. $\\log_a a = 1$; $\\log_a 1 = 0$; $a^{\\log_a x} = x$ ($x > 0$).' },
+  { id: 'b117', grade: 'I', tag: 'Algebră', prof: ['M1', 'M2', 'M3'],
+    question: 'Multiplu și divizor (în $\\mathbb{Z}$).',
+    answer: '$a$ este divizor al lui $b$ ($a \\mid b$) dacă $\\exists k \\in \\mathbb{Z}$ astfel încât $b = a \\cdot k$; atunci $b$ este multiplu al lui $a$.' },
+  { id: 'b118', grade: 'I', tag: 'Geometrie plană', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Ecuația dreptei determinate de două puncte $A$ și $B$.',
+    answer: '$\\frac{y - y_A}{y_B - y_A} = \\frac{x - x_A}{x_B - x_A}$ ($x_A \\neq x_B$, $y_A \\neq y_B$). Dacă $x_A = x_B$, dreapta este verticală ($x = x_A$) și nu are pantă.' },
+  { id: 'b119', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2', 'M3'],
+    question: 'Valorile funcțiilor trigonometrice pentru $0^\\circ$, $90^\\circ$, $180^\\circ$, $270^\\circ$, $360^\\circ$; echivalentul unghiurilor în radiani.',
+    answer: '$30^\\circ = \\frac{\\pi}{6}$, $45^\\circ = \\frac{\\pi}{4}$, $60^\\circ = \\frac{\\pi}{3}$, $90^\\circ = \\frac{\\pi}{2}$, $180^\\circ = \\pi$, $270^\\circ = \\frac{3\\pi}{2}$, $360^\\circ = 2\\pi$. Pentru $0^\\circ, 90^\\circ, 180^\\circ, 270^\\circ, 360^\\circ$: $\\sin$ ia valorile $0, 1, 0, -1, 0$, iar $\\cos$ ia valorile $1, 0, -1, 0, 1$. $tg$ nu este definită în $90^\\circ$ și $270^\\circ$; $ctg$ nu este definită în $0^\\circ$, $180^\\circ$, $360^\\circ$.' },
+  { id: 'b120', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Valori remarcabile pentru $tg$ și $ctg$: $30^\\circ$, $45^\\circ$, $60^\\circ$.',
+    answer: '$tg\\,30^\\circ = \\frac{\\sqrt{3}}{3}$, $tg\\,45^\\circ = 1$, $tg\\,60^\\circ = \\sqrt{3}$; $ctg\\,30^\\circ = \\sqrt{3}$, $ctg\\,45^\\circ = 1$, $ctg\\,60^\\circ = \\frac{\\sqrt{3}}{3}$.' },
+  { id: 'b121', grade: 'I', tag: 'Trigonometrie', prof: ['M1', 'M2'],
+    question: 'Ecuațiile trigonometrice $tg\\,x = a$ și $ctg\\,x = a$.',
+    answer: '$tg\\,x = a$, $a \\in \\mathbb{R} \\Rightarrow x = \\operatorname{arctg} a + k\\pi$, $k \\in \\mathbb{Z}$; $ctg\\,x = a$, $a \\in \\mathbb{R} \\Rightarrow x = \\operatorname{arcctg} a + k\\pi$, $k \\in \\mathbb{Z}$.' },
+  { id: 'b122', grade: 'I', tag: 'Geometrie plană', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Triunghiul dreptunghic: aria, înălțimea și mediana corespunzătoare ipotenuzei, raza cercului circumscris.',
+    answer: 'Pitagora: $ip^2 = c_1^2 + c_2^2$. $\\mathcal{A} = \\frac{c_1 \\cdot c_2}{2}$; $h = \\frac{c_1 \\cdot c_2}{ip}$; $m = \\frac{ip}{2}$; $R = \\frac{ip}{2}$.' },
+  { id: 'b123', grade: 'I', tag: 'Geometrie plană', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Triunghiul echilateral de latură $l$: perimetru, arie, înălțime.',
+    answer: 'Toate laturile sunt egale, toate unghiurile au $60^\\circ$. $P = 3l$; $\\mathcal{A} = \\frac{l^2\\sqrt{3}}{4}$; $h = \\frac{l\\sqrt{3}}{2}$.' },
+  { id: 'b124', grade: 'I', tag: 'Geometrie plană', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Elemente în triunghi: mediatoarea, înălțimea, mediana.',
+    answer: 'Mediatoarea unui segment este perpendiculara dusă prin mijlocul segmentului. Înălțimea este perpendiculara dusă dintr-un vârf pe latura opusă (sau pe prelungirea ei). Mediana este segmentul care unește un vârf cu mijlocul laturii opuse.' },
+  { id: 'b125', grade: 'I', tag: 'Numere complexe', prof: ['M1', 'M2', 'M3'],
+    question: 'Egalitatea a două numere complexe; produsul $z \\cdot \\bar{z}$.',
+    answer: '$a + bi = c + di \\iff a = c$ și $b = d$. $z \\cdot \\bar{z} = |z|^2 = a^2 + b^2$; $\\left|\\frac{z_1}{z_2}\\right| = \\frac{|z_1|}{|z_2|}$ ($z_2 \\neq 0$); $|z| = 0 \\iff z = 0$.' },
+  { id: 'b126', grade: 'I', tag: 'Vectori', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Adunarea vectorilor: regula triunghiului și regula paralelogramului.',
+    answer: 'Regula triunghiului: $\\vec{a} + \\vec{b}$ se obține plasând originea lui $\\vec{b}$ în vârful lui $\\vec{a}$; de exemplu $\\overrightarrow{AB} + \\overrightarrow{BC} = \\overrightarrow{AC}$. Regula paralelogramului: $\\vec{a} + \\vec{b}$ este diagonala paralelogramului construit pe $\\vec{a}$ și $\\vec{b}$ (cu originea comună).' },
+  { id: 'b127', grade: 'I', tag: 'Vectori', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Vectorul de poziție al mijlocului unui segment.',
+    answer: 'Dacă $M$ este mijlocul lui $[AB]$, atunci $\\overrightarrow{OM} = \\frac{\\overrightarrow{OA} + \\overrightarrow{OB}}{2}$ (pentru orice punct $O$).' },
+  { id: 'b128', grade: 'I', tag: 'Vectori', prof: ['M1', 'M2'],
+    question: 'Condiția de perpendicularitate a doi vectori.',
+    answer: '$\\vec{a} \\perp \\vec{b} \\iff \\vec{a} \\cdot \\vec{b} = 0 \\iff x_1x_2 + y_1y_2 = 0$, pentru $\\vec{a} = x_1\\vec{i} + y_1\\vec{j}$ și $\\vec{b} = x_2\\vec{i} + y_2\\vec{j}$. (La M3 și M4 nu se studiază produsul scalar.)' },
+
+  // ============ SUBIECTUL al II-lea - COMPLETĂRI DIN SINTEZA ACTUALIZATĂ ============
+  { id: 'b129', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Proprietăți ale determinanților: linii nule, linii identice sau proporționale, $\\det(\\alpha A)$, adunarea unei linii.',
+    answer: 'Un determinant cu o linie (coloană) nulă are valoarea 0. Un determinant cu două linii (coloane) identice sau proporționale are valoarea 0. $\\det(\\alpha A) = \\alpha^n \\det A$, pentru $A \\in \\mathcal{M}_n(\\mathbb{C})$. Dacă la o linie (coloană) se adună altă linie (coloană) înmulțită cu un număr, valoarea determinantului nu se schimbă.' },
+  { id: 'b130', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Pașii pentru calculul inversei unei matrice.',
+    answer: '1) Se calculează $\\det A$; dacă $\\det A \\neq 0$, $A$ este inversabilă. 2) Se scrie transpusa $A^T$. 3) Se scrie adjuncta $A^*$, înlocuind fiecare element din $A^T$ cu complementul său algebric $\\delta_{ij} = (-1)^{i+j} d_{ij}$. 4) $A^{-1} = \\frac{1}{\\det A} \\cdot A^*$. 5) Verificare: $A \\cdot A^{-1} = A^{-1} \\cdot A = I_n$.' },
+  { id: 'b131', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3', 'M4'],
+    question: 'Definiția corpului; exemple.',
+    answer: 'Un inel $(K, +, \\cdot)$ este corp dacă $0 \\neq 1$ și orice element nenul este inversabil față de înmulțire. Dacă înmulțirea este comutativă, corpul este comutativ. Exemple: $(\\mathbb{Q}, +, \\cdot)$, $(\\mathbb{R}, +, \\cdot)$, $(\\mathbb{C}, +, \\cdot)$, $(\\mathbb{Z}_p, +, \\cdot)$ cu $p$ prim. $(\\mathbb{Z}, +, \\cdot)$ este inel, dar nu este corp.' },
+  { id: 'b132', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
+    question: 'Teorema lui Bézout.',
+    answer: '$(X - a) \\mid P(X) \\iff P(a) = 0$, adică $X - a$ divide polinomul exact atunci când $a$ este rădăcină a lui $P$.' },
+  { id: 'b133', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
+    question: 'Schema lui Horner.',
+    answer: 'Pentru împărțirea lui $P(X) = a_nX^n + \\dots + a_0$ la $X - a$: pe prima linie se scriu coeficienții $a_n, a_{n-1}, \\dots, a_0$; se coboară $b_{n-1} = a_n$, apoi $b_{k-1} = a \\cdot b_k + a_k$. Ultima valoare obținută este restul $R = P(a)$, iar celelalte sunt coeficienții câtului.' },
+  { id: 'b134', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
+    question: 'Teorema împărțirii cu rest pentru polinoame.',
+    answer: 'Pentru orice polinoame $P(X)$ și $Q(X) \\neq 0$ există polinoamele unic determinate $C(X)$ (câtul) și $R(X)$ (restul), cu $\\operatorname{grad} R < \\operatorname{grad} Q$ sau $R = 0$, astfel încât $P = Q \\cdot C + R$.' },
+  { id: 'b135', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
+    question: 'Rădăcinile complexe ale unui polinom cu coeficienți reali.',
+    answer: 'Dacă un polinom cu coeficienți reali are rădăcina $z = \\alpha + \\beta i$ ($\\beta \\neq 0$), atunci are și rădăcina $\\bar{z} = \\alpha - \\beta i$.' },
+  { id: 'b136', grade: 'II', tag: 'Algebră superioară', prof: ['M1', 'M2', 'M3'],
+    question: 'Rădăcină multiplă de ordin $k$.',
+    answer: '$a$ este rădăcină multiplă de ordin $k$ a lui $P$ dacă $(X - a)^k \\mid P$ și $(X - a)^{k+1} \\nmid P$.' },
+
+  // ============ SUBIECTUL al III-lea - COMPLETĂRI DIN SINTEZA ACTUALIZATĂ ============
+  { id: 'b137', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Derivate uzuale: $(x)\'$, $\\left(\\frac{1}{x}\\right)\'$, $(\\sqrt{x})\'$, $(x^\\alpha)\'$.',
+    answer: '$(x)\' = 1$; $\\left(\\frac{1}{x}\\right)\' = -\\frac{1}{x^2}$; $(\\sqrt{x})\' = \\frac{1}{2\\sqrt{x}}$, $x > 0$; $(x^\\alpha)\' = \\alpha x^{\\alpha - 1}$, $\\alpha \\in \\mathbb{R}$, $x > 0$.' },
+  { id: 'b138', grade: 'III', tag: 'Analiză', prof: ['M1'],
+    question: 'Derivate uzuale: $(ctg\\,x)\'$, $(\\arccos x)\'$, $(\\operatorname{arcctg} x)\'$.',
+    answer: '$(ctg\\,x)\' = -\\frac{1}{\\sin^2 x} = -(1 + ctg^2 x)$; $(\\arccos x)\' = -\\frac{1}{\\sqrt{1 - x^2}}$, $x \\in (-1, 1)$; $(\\operatorname{arcctg} x)\' = -\\frac{1}{1 + x^2}$.' },
+  { id: 'b139', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Monotonia unei funcții cu ajutorul derivatei.',
+    answer: 'Pe un interval $I$: dacă $f\'(x) \\ge 0$, $\\forall x \\in I$, atunci $f$ este crescătoare pe $I$; dacă $f\'(x) \\le 0$, $\\forall x \\in I$, atunci $f$ este descrescătoare pe $I$. Punctele de extrem se caută printre rădăcinile lui $f\'$ în care $f\'$ își schimbă semnul.' },
+  { id: 'b140', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Convexitatea și concavitatea cu ajutorul derivatei a doua.',
+    answer: 'Pe un interval $I$: dacă $f\'\'(x) \\ge 0$, $\\forall x \\in I$, atunci $f$ este convexă pe $I$; dacă $f\'\'(x) \\le 0$, $\\forall x \\in I$, atunci $f$ este concavă pe $I$. Punctele în care $f\'\'$ se anulează și își schimbă semnul sunt puncte de inflexiune.' },
+  { id: 'b141', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Puncte de întoarcere și puncte unghiulare.',
+    answer: 'Fie $f$ continuă în $x_0$. Punct de întoarcere: derivatele laterale $f\'_s(x_0)$ și $f\'_d(x_0)$ sunt ambele infinite și de semne contrare. Punct unghiular: $f\'_s(x_0) \\neq f\'_d(x_0)$ și cel puțin una dintre ele este finită.' },
+  { id: 'b142', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Limite generale pentru $\\frac{1}{x}$ și pentru $\\ln x$.',
+    answer: '$\\lim_{x \\to \\pm\\infty} \\frac{1}{x} = 0$; $\\lim_{x \\to 0,\\, x > 0} \\frac{1}{x} = +\\infty$; $\\lim_{x \\to 0,\\, x < 0} \\frac{1}{x} = -\\infty$. $\\lim_{x \\to 0,\\, x > 0} \\ln x = -\\infty$; $\\lim_{x \\to \\infty} \\ln x = +\\infty$.' },
+  { id: 'b143', grade: 'III', tag: 'Analiză', prof: ['M1'],
+    question: 'Limite pentru funcțiile $tg$, $ctg$, $\\operatorname{arctg}$, $\\operatorname{arcctg}$.',
+    answer: '$\\lim_{x \\to \\frac{\\pi}{2},\\, x < \\frac{\\pi}{2}} tg\\,x = +\\infty$, $\\lim_{x \\to \\frac{\\pi}{2},\\, x > \\frac{\\pi}{2}} tg\\,x = -\\infty$; $\\lim_{x \\to 0,\\, x > 0} ctg\\,x = +\\infty$, $\\lim_{x \\to 0,\\, x < 0} ctg\\,x = -\\infty$; $\\lim_{x \\to \\pm\\infty} \\operatorname{arctg} x = \\pm\\frac{\\pi}{2}$; $\\lim_{x \\to \\infty} \\operatorname{arcctg} x = 0$, $\\lim_{x \\to -\\infty} \\operatorname{arcctg} x = \\pi$.' },
+  { id: 'b144', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Cazul de nedeterminare $\\frac{\\infty}{\\infty}$.',
+    answer: 'Se aplică regula lui l\'Hospital sau se scoate factor comun forțat termenul dominant. Ex: $\\lim_{x \\to \\infty} \\frac{x^2 + 1}{2x^2 + x} = \\lim_{x \\to \\infty} \\frac{1 + \\frac{1}{x^2}}{2 + \\frac{1}{x}} = \\frac{1}{2}$.' },
+  { id: 'b145', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Cazul de nedeterminare $\\infty - \\infty$.',
+    answer: 'Se aduce la același numitor sau se raționalizează. Ex: $\\lim_{x \\to \\infty} (\\sqrt{x + 1} - \\sqrt{x}) = \\lim_{x \\to \\infty} \\frac{1}{\\sqrt{x + 1} + \\sqrt{x}} = 0$.' },
+  { id: 'b146', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Cazul de nedeterminare $0 \\cdot \\infty$.',
+    answer: 'Se rescrie produsul ca un raport de tip $\\frac{0}{0}$ sau $\\frac{\\infty}{\\infty}$ și se aplică regula lui l\'Hospital. Ex: $\\lim_{x \\to 0,\\, x > 0} x \\ln x = \\lim \\frac{\\ln x}{\\frac{1}{x}} = \\lim \\frac{\\frac{1}{x}}{-\\frac{1}{x^2}} = \\lim (-x) = 0$.' },
+  { id: 'b147', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Limitele fundamentale $\\lim_{x \\to 0} \\frac{\\ln(1 + x)}{x}$ și $\\lim_{x \\to 0} \\frac{tg\\,x}{x}$.',
+    answer: '$\\lim_{x \\to 0} \\frac{\\ln(1 + x)}{x} = 1$; $\\lim_{x \\to 0} \\frac{tg\\,x}{x} = 1$ (limitele trigonometrice: doar la M1).' },
+  { id: 'b148', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Proprietăți ale integralei definite: liniaritate, aditivitate, inversarea limitelor.',
+    answer: '$\\int_a^b [f(x) + g(x)]\\,dx = \\int_a^b f(x)\\,dx + \\int_a^b g(x)\\,dx$; $\\int_a^b \\alpha f(x)\\,dx = \\alpha \\int_a^b f(x)\\,dx$; $\\int_a^b f(x)\\,dx = \\int_a^c f(x)\\,dx + \\int_c^b f(x)\\,dx$; $\\int_a^b f(x)\\,dx = -\\int_b^a f(x)\\,dx$; $\\int_a^a f(x)\\,dx = 0$.' },
+  { id: 'b149', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Proprietăți ale integralei definite: monotonia și modulul integralei.',
+    answer: 'Dacă $f(x) \\le g(x)$, $\\forall x \\in [a, b]$, atunci $\\int_a^b f(x)\\,dx \\le \\int_a^b g(x)\\,dx$. $\\left|\\int_a^b f(x)\\,dx\\right| \\le \\int_a^b |f(x)|\\,dx$.' },
+  { id: 'b150', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Integrale nedefinite: $\\int tg\\,x\\,dx$ și $\\int ctg\\,x\\,dx$.',
+    answer: '$\\int tg\\,x\\,dx = -\\ln|\\cos x| + C$ ($\\cos x \\neq 0$); $\\int ctg\\,x\\,dx = \\ln|\\sin x| + C$ ($\\sin x \\neq 0$).' },
+  { id: 'b151', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Integrale nedefinite: $\\int \\frac{dx}{x^2 + a^2}$ și $\\int \\frac{dx}{x^2 - a^2}$.',
+    answer: '$\\int \\frac{dx}{x^2 + a^2} = \\frac{1}{a}\\operatorname{arctg}\\frac{x}{a} + C$ ($a \\neq 0$); $\\int \\frac{dx}{x^2 - a^2} = \\frac{1}{2a}\\ln\\left|\\frac{x - a}{x + a}\\right| + C$ ($a \\neq 0$, $|x| \\neq |a|$). Cazuri particulare: $\\int \\frac{dx}{x^2 + 1} = \\operatorname{arctg} x + C$; $\\int \\frac{dx}{x^2 - 1} = \\frac{1}{2}\\ln\\left|\\frac{x - 1}{x + 1}\\right| + C$.' },
+  { id: 'b152', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Integrale nedefinite cu radical: $\\int \\frac{dx}{\\sqrt{a^2 - x^2}}$, $\\int \\frac{dx}{\\sqrt{x^2 + a^2}}$, $\\int \\frac{dx}{\\sqrt{x^2 - a^2}}$.',
+    answer: '$\\int \\frac{dx}{\\sqrt{a^2 - x^2}} = \\arcsin\\frac{x}{a} + C$ ($a > 0$, $x \\in (-a, a)$); $\\int \\frac{dx}{\\sqrt{x^2 + a^2}} = \\ln\\left(x + \\sqrt{x^2 + a^2}\\right) + C$; $\\int \\frac{dx}{\\sqrt{x^2 - a^2}} = \\ln\\left|x + \\sqrt{x^2 - a^2}\\right| + C$ ($a > 0$, $|x| > a$).' },
+  { id: 'b153', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Integrale cu funcția compusă $u(x)$.',
+    answer: 'Formulele rămân valabile înlocuind $x$ cu $u(x)$ și $dx$ cu $u\'(x)\\,dx$: $\\int \\frac{u\'(x)}{u(x)}\\,dx = \\ln|u(x)| + C$; $\\int u\'(x)e^{u(x)}\\,dx = e^{u(x)} + C$; $\\int \\frac{u\'(x)}{u^2(x) + a^2}\\,dx = \\frac{1}{a}\\operatorname{arctg}\\frac{u(x)}{a} + C$.' },
+  { id: 'b154', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Aria suprafeței cuprinse între graficele a două funcții.',
+    answer: '$\\mathcal{A} = \\int_a^b |f(x) - g(x)|\\,dx$; de obicei $a$ și $b$ sunt abscisele punctelor de intersecție ale graficelor.' },
+  { id: 'b155', grade: 'III', tag: 'Analiză', prof: ['M1', 'M2', 'M3'],
+    question: 'Integrarea prin părți și schimbarea de variabilă la integrala definită.',
+    answer: 'Prin părți: $\\int_a^b f(x)g\'(x)\\,dx = f(x)g(x)\\Big|_a^b - \\int_a^b f\'(x)g(x)\\,dx$. Schimbarea de variabilă: se schimbă și limitele de integrare, $\\int_a^b f(g(x))g\'(x)\\,dx = \\int_{g(a)}^{g(b)} f(t)\\,dt$.' }
     ];
 
     // ============================================================
@@ -1490,7 +1660,113 @@ mjx-container svg {
   b104: { q: 'Aria suprafeței delimitate de graficul funcției $f(x) = x^2$, axa $Ox$ și dreptele $x = 0$, $x = 3$ este:',
          c: '$9$', w: ['$3$', '$6$', '$27$'] },
   b105: { q: 'Volumul corpului obținut prin rotirea în jurul axei $Ox$ a graficului funcției $f(x) = x$, $x \\in [0, 3]$, este:',
-         c: '$9\\pi$', w: ['$3\\pi$', '$\\frac{9\\pi}{2}$', '$27\\pi$'] }
+         c: '$9\\pi$', w: ['$3\\pi$', '$\\frac{9\\pi}{2}$', '$27\\pi$'] },
+
+  // ---------- SUBIECTUL I - COMPLETĂRI DIN SINTEZA ACTUALIZATĂ ----------
+  b106: { q: '$(x - 2)^3$ este egal cu:',
+         c: '$x^3 - 6x^2 + 12x - 8$', w: ['$x^3 - 8$', '$x^3 - 6x^2 - 12x - 8$', '$x^3 + 6x^2 + 12x - 8$'] },
+  b107: { q: '$x^3 + 27$ se descompune în:',
+         c: '$(x + 3)(x^2 - 3x + 9)$', w: ['$(x + 3)(x^2 + 3x + 9)$', '$(x + 3)^3$', '$(x - 3)(x^2 + 3x + 9)$'] },
+  b108: { q: 'Dacă $|x - 1| + |y + 2| = 0$, atunci:',
+         c: '$x = 1$ și $y = -2$', w: ['$x = -1$ și $y = 2$', '$x = y = 0$', 'ecuația nu are soluții'] },
+  b109: { q: '$\\sqrt[3]{x^2}$, $x > 0$, scris ca putere este:',
+         c: '$x^{\\frac{2}{3}}$', w: ['$x^{\\frac{3}{2}}$', '$x^{6}$', '$x^{-\\frac{2}{3}}$'] },
+  b110: { q: 'Funcția $f:\\mathbb{R}\\to\\mathbb{R}$, $f(x) = x^2$ este:',
+         c: 'nici injectivă, nici surjectivă', w: ['bijectivă', 'injectivă, dar nu surjectivă', 'surjectivă, dar nu injectivă'] },
+  b111: { q: 'Graficul funcției $f(x) = x^2 - 5x + 4$ intersectează axa $Ox$ în punctele de abscise:',
+         c: '$1$ și $4$', w: ['$-1$ și $-4$', '$0$ și $4$', 'doar $4$'] },
+  b112: { q: 'Soluția inecuației $x^2 - 4x + 3 < 0$ este:',
+         c: '$x \\in (1, 3)$', w: ['$x \\in (-\\infty, 1) \\cup (3, \\infty)$', '$x \\in [1, 3]$', '$x \\in \\mathbb{R}$'] },
+  b113: { q: 'Valoarea maximă a funcției $f(x) = -x^2 + 6x - 5$ este:',
+         c: '$4$', w: ['$-5$', '$3$', '$9$'] },
+  b114: { q: 'Dacă $x_1, x_2$ sunt soluțiile ecuației $x^2 - 3x + 1 = 0$, atunci $x_1^2 + x_2^2$ este:',
+         c: '$7$', w: ['$3$', '$9$', '$11$'] },
+  b115: { q: 'Mulțimea soluțiilor ecuației $4^x - 3 \\cdot 2^x + 2 = 0$ este:',
+         c: '$\\{0, 1\\}$', w: ['$\\{1, 2\\}$', '$\\{0\\}$', '$\\{1\\}$'] },
+  b116: { q: 'Soluția ecuației $\\log_2(x - 1) = 3$ este:',
+         c: '$x = 9$', w: ['$x = 4$', '$x = 7$', '$x = 10$'] },
+  b117: { q: 'Câți divizori întregi are numărul $6$?',
+         c: '$8$', w: ['$4$', '$6$', '$12$'] },
+  b118: { q: 'Ecuația dreptei $AB$, cu $A(1, 2)$ și $B(3, 6)$, este:',
+         c: '$y = 2x$', w: ['$y = 2x + 2$', '$y = \\frac{1}{2}x + \\frac{3}{2}$', '$y = 4x - 2$'] },
+  b119: { q: '$\\cos 180^\\circ + \\sin 270^\\circ$ este egal cu:',
+         c: '$-2$', w: ['$-1$', '$0$', '$2$'] },
+  b120: { q: '$tg\\,30^\\circ \\cdot ctg\\,60^\\circ$ este egal cu:',
+         c: '$\\frac{1}{3}$', w: ['$1$', '$3$', '$\\sqrt{3}$'] },
+  b121: { q: 'Soluțiile ecuației $tg\\,x = 1$ sunt ($k \\in \\mathbb{Z}$):',
+         c: '$x = \\frac{\\pi}{4} + k\\pi$', w: ['$x = \\frac{\\pi}{4} + 2k\\pi$', '$x = \\pm\\frac{\\pi}{4} + 2k\\pi$', '$x = (-1)^k\\frac{\\pi}{4} + k\\pi$'] },
+  b122: { q: 'Un triunghi dreptunghic are catetele de 5 și 12. Raza cercului circumscris este:',
+         c: '$\\frac{13}{2}$', w: ['$6$', '$13$', '$\\frac{60}{13}$'] },
+  b123: { q: 'Aria unui triunghi echilateral cu latura 6 este:',
+         c: '$9\\sqrt{3}$', w: ['$3\\sqrt{3}$', '$18\\sqrt{3}$', '$36\\sqrt{3}$'] },
+  b124: { q: 'Segmentul care unește un vârf al unui triunghi cu mijlocul laturii opuse se numește:',
+         c: 'mediană', w: ['mediatoare', 'înălțime', 'bisectoare'] },
+  b125: { q: 'Dacă $z = 2 + 3i$, atunci $z \\cdot \\bar{z}$ este:',
+         c: '$13$', w: ['$-5$', '$4 + 9i$', '$\\sqrt{13}$'] },
+  b126: { q: 'În paralelogramul $ABCD$, $\\overrightarrow{AB} + \\overrightarrow{AD}$ este egal cu:',
+         c: '$\\overrightarrow{AC}$', w: ['$\\overrightarrow{BD}$', '$\\overrightarrow{DB}$', '$\\overrightarrow{CA}$'] },
+  b127: { q: '$M$ este mijlocul segmentului $[AB]$. Atunci $\\overrightarrow{OA} + \\overrightarrow{OB}$ este egal cu:',
+         c: '$2\\overrightarrow{OM}$', w: ['$\\overrightarrow{OM}$', '$\\frac{1}{2}\\overrightarrow{OM}$', '$\\overrightarrow{AB}$'] },
+  b128: { q: 'Vectorii $\\vec{u} = 2\\vec{i} + 3\\vec{j}$ și $\\vec{v} = a\\vec{i} - 4\\vec{j}$ sunt perpendiculari pentru $a$ egal cu:',
+         c: '$6$', w: ['$-6$', '$-\\frac{8}{3}$', '$\\frac{8}{3}$'] },
+
+  // ---------- SUBIECTUL al II-lea - COMPLETĂRI DIN SINTEZA ACTUALIZATĂ ----------
+  b129: { q: 'Dacă $A \\in \\mathcal{M}_3(\\mathbb{R})$ și $\\det A = 2$, atunci $\\det(2A)$ este:',
+         c: '$16$', w: ['$4$', '$6$', '$8$'] },
+  b130: { q: 'Matricea $A = \\begin{pmatrix} 2 & 4 \\\\ 1 & 2 \\end{pmatrix}$:',
+         c: 'nu este inversabilă, deoarece $\\det A = 0$', w: ['este inversabilă, deoarece $\\det A = 8$', 'este inversabilă, deoarece are toate elementele nenule', 'are inversa $\\begin{pmatrix} 2 & -4 \\\\ -1 & 2 \\end{pmatrix}$'] },
+  b131: { q: 'Care dintre următoarele NU este corp?',
+         c: '$(\\mathbb{Z}, +, \\cdot)$', w: ['$(\\mathbb{Q}, +, \\cdot)$', '$(\\mathbb{R}, +, \\cdot)$', '$(\\mathbb{Z}_5, +, \\cdot)$'] },
+  b132: { q: 'Polinomul $P(X) = X^3 + mX - 6$ se divide cu $X - 2$ pentru $m$ egal cu:',
+         c: '$-1$', w: ['$1$', '$-7$', '$7$'] },
+  b133: { q: 'Câtul împărțirii polinomului $X^2 + 3X + 5$ la $X - 1$ este:',
+         c: '$X + 4$', w: ['$X + 2$', '$X + 3$', '$X - 4$'] },
+  b134: { q: 'La împărțirea unui polinom la $X^2 + 1$, restul are gradul cel mult:',
+         c: '$1$', w: ['$0$', '$2$', '$3$'] },
+  b135: { q: 'Un polinom cu coeficienți reali are rădăcina $1 + 2i$. Atunci el mai are sigur rădăcina:',
+         c: '$1 - 2i$', w: ['$-1 - 2i$', '$-1 + 2i$', '$2 + i$'] },
+  b136: { q: 'Pentru $P(X) = (X - 1)^3(X + 2)$, numărul $1$ este rădăcină:',
+         c: 'triplă (de ordin 3)', w: ['simplă', 'dublă', 'de ordin 4'] },
+
+  // ---------- SUBIECTUL al III-lea - COMPLETĂRI DIN SINTEZA ACTUALIZATĂ ----------
+  b137: { q: 'Derivata funcției $f(x) = \\sqrt{x} + \\frac{1}{x}$, $x > 0$, este:',
+         c: '$\\frac{1}{2\\sqrt{x}} - \\frac{1}{x^2}$', w: ['$\\frac{1}{2\\sqrt{x}} + \\frac{1}{x^2}$', '$2\\sqrt{x} - \\frac{1}{x^2}$', '$\\frac{1}{\\sqrt{x}} + \\ln x$'] },
+  b138: { q: 'Derivata funcției $f(x) = \\operatorname{arctg} x + \\operatorname{arcctg} x$ este:',
+         c: '$0$', w: ['$1$', '$\\frac{2}{1 + x^2}$', '$-\\frac{2}{1 + x^2}$'] },
+  b139: { q: 'Funcția $f(x) = x^3 - 3x$ este descrescătoare pe intervalul:',
+         c: '$[-1, 1]$', w: ['$(-\\infty, -1]$', '$[1, \\infty)$', '$\\mathbb{R}$'] },
+  b140: { q: 'Funcția $f(x) = x^3$ este convexă pe intervalul:',
+         c: '$[0, \\infty)$', w: ['$(-\\infty, 0]$', '$\\mathbb{R}$', '$[-1, 1]$'] },
+  b141: { q: 'Pentru $f(x) = |x|$, punctul $x_0 = 0$ este:',
+         c: 'punct unghiular', w: ['punct de întoarcere', 'punct de inflexiune', 'punct în care $f$ este derivabilă'] },
+  b142: { q: '$\\lim_{x \\to 0,\\, x > 0} \\ln x$ este:',
+         c: '$-\\infty$', w: ['$0$', '$1$', '$+\\infty$'] },
+  b143: { q: '$\\lim_{x \\to \\infty} \\operatorname{arctg} x$ este:',
+         c: '$\\frac{\\pi}{2}$', w: ['$0$', '$\\pi$', '$+\\infty$'] },
+  b144: { q: '$\\lim_{x \\to \\infty} \\frac{3x^2 - x}{x^2 + 5}$ este:',
+         c: '$3$', w: ['$0$', '$-\\frac{1}{5}$', '$\\infty$'] },
+  b145: { q: '$\\lim_{x \\to \\infty} \\left(\\sqrt{x^2 + 4x} - x\\right)$ este:',
+         c: '$2$', w: ['$0$', '$4$', '$\\infty$'] },
+  b146: { q: '$\\lim_{x \\to 0,\\, x > 0} x \\ln x$ este:',
+         c: '$0$', w: ['$-\\infty$', '$1$', '$-1$'] },
+  b147: { q: '$\\lim_{x \\to 0} \\frac{\\ln(1 + 3x)}{x}$ este:',
+         c: '$3$', w: ['$0$', '$1$', '$\\frac{1}{3}$'] },
+  b148: { q: 'Dacă $\\int_0^1 f(x)\\,dx = 3$ și $\\int_1^4 f(x)\\,dx = 5$, atunci $\\int_0^4 f(x)\\,dx$ este:',
+         c: '$8$', w: ['$-2$', '$2$', '$15$'] },
+  b149: { q: 'Dacă $f$ este continuă și $f(x) \\ge 0$ pentru orice $x \\in [a, b]$, atunci $\\int_a^b f(x)\\,dx$ este:',
+         c: 'mai mare sau egală cu $0$', w: ['strict negativă', 'egală cu $0$', 'egală cu $f(b) - f(a)$'] },
+  b150: { q: 'Pe intervalul $\\left(0, \\frac{\\pi}{2}\\right)$, $\\int tg\\,x\\,dx$ este:',
+         c: '$-\\ln(\\cos x) + C$', w: ['$\\ln(\\cos x) + C$', '$\\frac{1}{\\cos^2 x} + C$', '$\\ln(\\sin x) + C$'] },
+  b151: { q: '$\\int \\frac{dx}{x^2 + 4}$ este:',
+         c: '$\\frac{1}{2}\\operatorname{arctg}\\frac{x}{2} + C$', w: ['$\\operatorname{arctg}\\frac{x}{2} + C$', '$\\frac{1}{4}\\ln\\left|\\frac{x - 2}{x + 2}\\right| + C$', '$\\ln(x^2 + 4) + C$'] },
+  b152: { q: 'Pe intervalul $(-1, 1)$, $\\int \\frac{dx}{\\sqrt{1 - x^2}}$ este:',
+         c: '$\\arcsin x + C$', w: ['$\\arccos x + C$', '$\\operatorname{arctg} x + C$', '$\\ln\\left(x + \\sqrt{1 - x^2}\\right) + C$'] },
+  b153: { q: '$\\int \\frac{2x}{x^2 + 1}\\,dx$ este:',
+         c: '$\\ln(x^2 + 1) + C$', w: ['$\\operatorname{arctg} x + C$', '$2\\ln(x^2 + 1) + C$', '$\\frac{1}{x^2 + 1} + C$'] },
+  b154: { q: 'Aria suprafeței cuprinse între graficele funcțiilor $f(x) = x$ și $g(x) = x^2$, pentru $x \\in [0, 1]$, este:',
+         c: '$\\frac{1}{6}$', w: ['$\\frac{1}{2}$', '$\\frac{1}{3}$', '$\\frac{5}{6}$'] },
+  b155: { q: 'Cu substituția $t = x^2$, $\\int_0^2 x e^{x^2}\\,dx$ devine:',
+         c: '$\\frac{1}{2}\\int_0^4 e^t\\,dt$', w: ['$\\int_0^2 e^t\\,dt$', '$2\\int_0^4 e^t\\,dt$', '$\\frac{1}{2}\\int_0^2 e^t\\,dt$'] }
     };
 
     // ============================================================
@@ -1541,6 +1817,11 @@ mjx-container svg {
     const resetLearnedBtn = document.getElementById('resetLearnedBtn');
     const tagFilter = document.getElementById('tagFilter');
     const gradeFilter = document.getElementById('gradeFilter');
+    const profileFilter = document.getElementById('profileFilter');
+    const PROFILE_KEY = 'anki_matematica_bac_profile_v1';
+    const ALL_PROFILES = ['M1', 'M2', 'M3', 'M4'];
+    function cardProfiles(c) { return Array.isArray(c.prof) ? c.prof : ALL_PROFILES; }
+    function formatProfiles(c) { const p = cardProfiles(c); return p.length ? p.join(', ') : 'în afara programei 2027'; }
     const searchInput = document.getElementById('searchInput');
     const flashcard = document.getElementById('flashcard');
     const shuffleBtn = document.getElementById('shuffleBtn');
@@ -1626,7 +1907,7 @@ mjx-container svg {
         cardAnswer.classList.add('hidden');
         showingAnswer=false;
         cardId.textContent='#'+card.id;
-        cardSource.textContent='Sinteză Teorie Bac';
+        cardSource.textContent='Sinteză Teorie Bac · '+formatProfiles(card);
         updateStats();
         setTimeout(()=>renderLatex(cardQuestion),50);
     }
@@ -1726,7 +2007,9 @@ mjx-container svg {
             }
             let matchLearned=true;
             if(unlearnedOnly) matchLearned=!learnedSet.has(c.id);
-            return matchTag&&matchGrade&&matchSearch&&matchLearned;
+            const prof=profileFilter.value;
+            const matchProf=prof==='all'||cardProfiles(c).includes(prof);
+            return matchTag&&matchGrade&&matchSearch&&matchLearned&&matchProf;
         });
         if(currentIndex>=filteredCards.length) currentIndex=Math.max(0,filteredCards.length-1);
         if(filteredCards.length===0) currentIndex=0;
@@ -1749,6 +2032,7 @@ mjx-container svg {
     learnedBtn.addEventListener('click',toggleLearned);
     resetLearnedBtn.addEventListener('click',resetLearned);
     tagFilter.addEventListener('change',applyFilters);
+    profileFilter.addEventListener('change',()=>{ try{ localStorage.setItem(PROFILE_KEY, profileFilter.value); }catch(e){} applyFilters(); });
     gradeFilter.addEventListener('change',applyFilters);
     searchInput.addEventListener('input',applyFilters);
     searchInput.addEventListener('search',applyFilters);
@@ -1817,7 +2101,7 @@ mjx-container svg {
 
     function loadQuizHistory(){ try{const raw=localStorage.getItem(QUIZ_HISTORY_KEY); if(raw) return JSON.parse(raw);}catch(e){} return {}; }
     function saveQuizBest(scopeKey,percent){ try{const hist=loadQuizHistory(); if(!hist[scopeKey]||percent>hist[scopeKey]){hist[scopeKey]=percent; localStorage.setItem(QUIZ_HISTORY_KEY,JSON.stringify(hist));}}catch(e){} }
-    function currentQuizScopeKey(){ return 'g'+gradeFilter.value+'_t'+tagFilter.value; }
+    function currentQuizScopeKey(){ return 'g'+gradeFilter.value+'_t'+tagFilter.value+'_p'+profileFilter.value; }
     function shuffleArray(a){ const arr=a.slice(); for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
 
     function openQuizSetup(){
@@ -2300,7 +2584,8 @@ mjx-container svg {
 
     // ============ INIȚIALIZARE ============
     try { const savedTheme=localStorage.getItem(THEME_KEY); if(savedTheme==='dark') applyTheme(true); else if(!savedTheme&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme(true); } catch(e) {}
-    renderCard(); updateStats();
+    try { const savedProfile=localStorage.getItem(PROFILE_KEY); if(savedProfile && profileFilter.querySelector('option[value="'+savedProfile+'"]')) profileFilter.value=savedProfile; } catch(e) {}
+    applyFilters();
     window.addEventListener('load', ()=>{ if(window.MathJax&&window.MathJax.typesetPromise) window.MathJax.typesetPromise().catch(()=>{}); });
     const observer = new MutationObserver(()=>{ if(!cardAnswer.classList.contains('hidden')) renderLatex(cardAnswer); });
     observer.observe(cardAnswer, { attributes: true, attributeFilter: ['class'] });
